@@ -12,6 +12,7 @@
     function Uploader(options) {
       this.files = [];
       this.multi = options.multi || true;
+      this.locked = options.locked || false;
     }
 
     Uploader.prototype.add = function(files, options) {
@@ -36,7 +37,9 @@
       var dupePosition = uploader._indexOfFilename(file.name); 
       var dupe = dupePosition >= 0;
 
-      file = new File(file);
+      file = new File(file, uploader, {
+        locked: uploader.locked
+      });
 
       if (dupe) {
         if (replace) {
@@ -54,6 +57,14 @@
 
       deferred.resolve();
 
+      return deferred.promise;
+    }
+
+    Uploader.prototype._remove = function(file) {
+      var deferred = $q.defer();
+      this.files.splice(this._indexOfFilename(file.name), 1);
+
+      deferred.resolve();
       return deferred.promise;
     }
 

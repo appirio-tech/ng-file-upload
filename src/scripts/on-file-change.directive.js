@@ -16,6 +16,7 @@
       link: function(scope, element, attr, ctrl) {
         element.bind("change", function() {
           scope.onFileChange({fileList : element[0].files});
+          this.value = '';
         });
       }
     }

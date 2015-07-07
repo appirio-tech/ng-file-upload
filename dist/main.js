@@ -1,5 +1,5 @@
 angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<span>{{file.name}}</span><button ng-show=\"file.status == \'failed\'\" ng-click=\"file.retry()\">Retry</button><button ng-show=\"file.status == \'progress\'\" ng-click=\"file.cancel()\">Cancel</button><button ng-show=\"file.status == \'done\'\" ng-click=\"file.remove()\">Remove</button>");
-$templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
+$templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
 (function () {
   'use strict';
 
@@ -50,9 +50,21 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/
   /* @ngInject */
   function File($q) {
 
-    function File(file) {
-      this.name = file.name;
-      this.status = 'done';
+    function File(data, uploader, options) {
+      var file = this;
+      file.data = data;
+      file.name = data.name;
+      file.status = 'new';
+      file.locked = options.locked || false;
+      file.uploader = uploader;
+
+      file._upload().then(function(){
+        file.status = 'done';
+      });
+
+      console.log(file);
+
+      return file;
     }
 
     File.prototype.retry = function() {
@@ -62,6 +74,18 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/
     }
 
     File.prototype.remove = function() {
+      this.uploader._remove(this);
+    }
+
+    File.prototype._upload = function() {
+      var deferred = $q.defer();
+      this.status = 'progress';
+
+      setTimeout(function(){
+        deferred.resolve();
+      }, 1000);
+
+      return deferred.promise;
     }
 
     return File;
@@ -87,6 +111,7 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/
       link: function(scope, element, attr, ctrl) {
         element.bind("change", function() {
           scope.onFileChange({fileList : element[0].files});
+          this.value = '';
         });
       }
     }
@@ -107,13 +132,6 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/
 
     vm.uploader = new Uploader({
     });
-
-    // TODO: Remove mock files
-    vm.uploader.add([
-      { name: 'one.jpg' },
-      { name: 'two.jpg' },
-      { name: 'three.jpg' }
-    ])
 
   }
   
@@ -150,6 +168,7 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/
     function Uploader(options) {
       this.files = [];
       this.multi = options.multi || true;
+      this.locked = options.locked || false;
     }
 
     Uploader.prototype.add = function(files, options) {
@@ -174,7 +193,9 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/
       var dupePosition = uploader._indexOfFilename(file.name); 
       var dupe = dupePosition >= 0;
 
-      file = new File(file);
+      file = new File(file, uploader, {
+        locked: uploader.locked
+      });
 
       if (dupe) {
         if (replace) {
@@ -192,6 +213,14 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\"/
 
       deferred.resolve();
 
+      return deferred.promise;
+    }
+
+    Uploader.prototype._remove = function(file) {
+      var deferred = $q.defer();
+      this.files.splice(this._indexOfFilename(file.name), 1);
+
+      deferred.resolve();
       return deferred.promise;
     }
 

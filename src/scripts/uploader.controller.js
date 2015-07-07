@@ -13,13 +13,6 @@
     vm.uploader = new Uploader({
     });
 
-    // TODO: Remove mock files
-    vm.uploader.add([
-      { name: 'one.jpg' },
-      { name: 'two.jpg' },
-      { name: 'three.jpg' }
-    ])
-
   }
   
 })();
