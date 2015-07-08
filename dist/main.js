@@ -1,5 +1,5 @@
 angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<span>{{file.name}}</span><button ng-show=\"file.status == \'failed\'\" ng-click=\"file.retry()\">Retry</button><button ng-show=\"file.status == \'progress\'\" ng-click=\"file.cancel()\">Cancel</button><button ng-show=\"file.status == \'done\'\" ng-click=\"file.remove()\">Remove</button>");
-$templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
+$templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.multiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.multiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
 (function () {
   'use strict';
 
@@ -130,6 +130,12 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\" 
   function UploaderController($scope, Uploader) {
     var vm = this;
 
+    if ($scope.multiple === 'true') vm.multiple = true;
+    else if ($scope.multiple === 'false') vm.multiple = false;
+    else vm.multiple = true;
+
+    console.log(vm.multiple);
+
     vm.uploader = new Uploader({
     });
 
@@ -147,6 +153,7 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input type=\"file\" 
   function apUploader() {
     return {
       scope: {
+        multiple: '@'
       },
       controller: 'UploaderController as vm',
       templateUrl: 'uploader.html'

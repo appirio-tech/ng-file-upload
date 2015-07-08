@@ -10,6 +10,12 @@
   function UploaderController($scope, Uploader) {
     var vm = this;
 
+    if ($scope.multiple === 'true') vm.multiple = true;
+    else if ($scope.multiple === 'false') vm.multiple = false;
+    else vm.multiple = true;
+
+    console.log(vm.multiple);
+
     vm.uploader = new Uploader({
     });
 

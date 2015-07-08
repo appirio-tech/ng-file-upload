@@ -8,6 +8,7 @@
   function apUploader() {
     return {
       scope: {
+        multiple: '@'
       },
       controller: 'UploaderController as vm',
       templateUrl: 'uploader.html'
