@@ -1,4 +1,6 @@
-span {{file.name}}
-button(ng-show="file.status == 'failed'" ng-click="file.retry()") Retry
-button(ng-show="file.status == 'progress'" ng-click="file.cancel()") Cancel
-button(ng-show="file.status == 'done'" ng-click="file.remove()") Remove
+div(ng-class="vm.file.status")
+  span {{vm.file.name}}
+  button(ng-show="vm.file.status == 'started'", ng-click="vm.file.cancel()") Cancel
+  button(ng-show="vm.file.status == 'succeeded' || vm.file.status == 'failed'", ng-click="vm.file.remove()") Remove
+  button(ng-show="vm.file.status == 'failed'", ng-click="vm.file.retry()") Retry
+  progress(ng-show="vm.file.status == 'started'", value="{{vm.file.progress}}", max="100") {{vm.file.progress}}%

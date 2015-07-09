@@ -1,4 +1,4 @@
-angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<span>{{file.name}}</span><button ng-show=\"file.status == \'failed\'\" ng-click=\"file.retry()\">Retry</button><button ng-show=\"file.status == \'progress\'\" ng-click=\"file.cancel()\">Cancel</button><button ng-show=\"file.status == \'done\'\" ng-click=\"file.remove()\">Remove</button>");
+angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"vm.file.status\"><span>{{vm.file.name}}</span><button ng-show=\"vm.file.status == \'started\'\" ng-click=\"vm.file.cancel()\">Cancel</button><button ng-show=\"vm.file.status == \'succeeded\' || vm.file.status == \'failed\'\" ng-click=\"vm.file.remove()\">Remove</button><button ng-show=\"vm.file.status == \'failed\'\" ng-click=\"vm.file.retry()\">Retry</button><progress ng-show=\"vm.file.status == \'started\'\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress></div>");
 $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.multiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.multiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
 (function () {
   'use strict';
@@ -17,6 +17,7 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.mul
 
   function FileController($scope, Uploader) {
     var vm = this;
+    vm.file = $scope.file;
   }
   
 })();
@@ -56,7 +57,7 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.mul
       // Public properties
       file.data = data;
       file.name = data.name;
-      file.status = 'new';
+      file.status = 'created';
       file.locked = options.locked || false;
 
       // Initialize
@@ -101,7 +102,9 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.mul
       xhr.onerror = file._onError.bind(file);
       xhr.onabort = file._onAbort.bind(file);
 
-      file.status = 'progress';
+      file.status = 'started';
+      file.progress = 0;
+
       xhr.open('POST', 'http://localhost:5000/delay/3000', true);
       xhr.send(formData);
     };
@@ -114,7 +117,7 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.mul
       var response = this._transformResponse(this._xhr);
 
       if (this._isSuccessCode(this._xhr.status)) {
-        this.status = 'done';
+        this.status = 'succeeded';
         this.onSuccess(response);
       } else {
         this.status = 'failed';
@@ -243,7 +246,11 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.mul
   function apUploader() {
     return {
       scope: {
-        multiple: '@'
+        multiple: '@',
+        locked: '@',
+        queryUrl: '@',
+        presignedUrl: '@',
+        uploadUrl: '@'
       },
       controller: 'UploaderController as vm',
       templateUrl: 'uploader.html'
@@ -320,13 +327,11 @@ $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.mul
       });
 
       file.onSuccess = function(response) {
-        console.log('Success', response)
-        console.log(file);
         uploader.onUpdate();
       };
 
       file.onFailure = function(response) {
-        console.log('Failure', response)
+        uploader.onUpdate();
       };
 
       file.onRemove = function(file) {

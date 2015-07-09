@@ -67,13 +67,11 @@
       });
 
       file.onSuccess = function(response) {
-        console.log('Success', response)
-        console.log(file);
         uploader.onUpdate();
       };
 
       file.onFailure = function(response) {
-        console.log('Failure', response)
+        uploader.onUpdate();
       };
 
       file.onRemove = function(file) {

@@ -9,6 +9,7 @@
 
   function FileController($scope, Uploader) {
     var vm = this;
+    vm.file = $scope.file;
   }
   
 })();

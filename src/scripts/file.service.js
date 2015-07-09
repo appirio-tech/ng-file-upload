@@ -15,7 +15,7 @@
       // Public properties
       file.data = data;
       file.name = data.name;
-      file.status = 'new';
+      file.status = 'created';
       file.locked = options.locked || false;
 
       // Initialize
@@ -60,7 +60,9 @@
       xhr.onerror = file._onError.bind(file);
       xhr.onabort = file._onAbort.bind(file);
 
-      file.status = 'progress';
+      file.status = 'started';
+      file.progress = 0;
+
       xhr.open('POST', 'http://localhost:5000/delay/3000', true);
       xhr.send(formData);
     };
@@ -73,7 +75,7 @@
       var response = this._transformResponse(this._xhr);
 
       if (this._isSuccessCode(this._xhr.status)) {
-        this.status = 'done';
+        this.status = 'succeeded';
         this.onSuccess(response);
       } else {
         this.status = 'failed';
