@@ -50,7 +50,7 @@ html(ng-app="example-app")
       link(href="styles/#{path}.desktop.css", rel="stylesheet", media="(min-width: 767px)")
 
   body
-    ap-uploader(multiple="false")
+    ap-uploader(multiple="true")
 
     each path in bowers
       script(src="bower_components/#{path}.js", type="text/javascript")

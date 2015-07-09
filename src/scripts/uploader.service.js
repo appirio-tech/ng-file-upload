@@ -30,6 +30,8 @@
       }));
     }
 
+    Uploader.prototype.onUpdate = function() {}
+
     Uploader.prototype._add = function(file, options) {
       var deferred = $q.defer();
       var uploader = this;
@@ -37,9 +39,7 @@
       var dupePosition = uploader._indexOfFilename(file.name); 
       var dupe = dupePosition >= 0;
 
-      file = new File(file, uploader, {
-        locked: uploader.locked
-      });
+      file = uploader._newFile(file, options);
 
       if (dupe) {
         if (replace) {
@@ -60,6 +60,29 @@
       return deferred.promise;
     }
 
+    Uploader.prototype._newFile = function(file, options) {
+      var uploader = this;
+      file = new File(file, uploader, {
+        locked: uploader.locked
+      });
+
+      file.onSuccess = function(response) {
+        console.log('Success', response)
+        console.log(file);
+        uploader.onUpdate();
+      };
+
+      file.onFailure = function(response) {
+        console.log('Failure', response)
+      };
+
+      file.onRemove = function(file) {
+        uploader._remove(file);
+      };
+
+      return file;
+    }
+
     Uploader.prototype._remove = function(file) {
       var deferred = $q.defer();
       this.files.splice(this._indexOfFilename(file.name), 1);
@@ -76,14 +99,6 @@
       };
 
       return -1;
-    }
-
-    Uploader.prototype._uploadFile = function(file) {
-      return getSignedUploadUrl(projectId, file.name)
-        .then(function(res) {
-          var signedUploadUrl = res.result.content.preSignedUrlUpload;
-          return uploadToSignedUrl(signedUploadUrl, file);
-        });
     }
 
     function filelistToArray(collection) {
