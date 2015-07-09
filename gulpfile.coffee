@@ -52,7 +52,6 @@ configs.coverageReporter =
 configs.buildFiles =
   concat:
     'main.js': [
-      '.tmp/scripts/templates.js'
       'src/scripts/ap-file-upload.module.js'
       'src/scripts/templates.js'
       'src/scripts/uploader.service.js'
@@ -62,6 +61,7 @@ configs.buildFiles =
       'src/scripts/uploader.controller.js'
       'src/scripts/file.directive.js'
       'src/scripts/file.controller.js'
+      '.tmp/scripts/templates.js'
     ]
     'main.css': [
       '.tmp/styles/**/*.css'
