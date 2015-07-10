@@ -24,7 +24,15 @@
     vm.uploaderStatus = 'pristine';
 
     vm.queryUrl = formatUrl({
-      domain: 'http://api.topcoder-dev.com/v3/',
+      domain: 'http://192.168.1.126:8080/v3/',
+      path: 'workrequestfiles',
+      filters: {
+        workRequestId: '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
+      }
+    });
+
+    vm.fileEndpoint = formatUrl({
+      domain: 'http://192.168.1.126:8080/v3/',
       path: 'workrequestfiles',
       filters: {
         workRequestId: '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
@@ -32,7 +40,7 @@
     });
 
     vm.presignerUrl = formatUrl({
-      domain: 'http://api.topcoder-dev.com/v3/',
+      domain: 'http://192.168.1.126:8080/v3/',
       path: 'workrequestfiles/uploadurl',
       filters: {
         workRequestId: '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',

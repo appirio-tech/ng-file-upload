@@ -11,6 +11,7 @@
         multiple: '@',
         locked: '@',
         queryUrl: '@',
+        fileEndpoint: '@',
         urlPresigner: '@',
         status: '='
       },

@@ -2,7 +2,8 @@
   'use strict';
 
   angular.module('ap-file-upload', [
-    'appirio-tech-ng-auth'
+    'appirio-tech-ng-auth',
+    'ngResource'
   ]);
 
 })();

@@ -2,7 +2,8 @@
   'use strict';
 
   angular.module('ap-file-upload', [
-    'appirio-tech-ng-auth'
+    'appirio-tech-ng-auth',
+    'ngResource'
   ]);
 
 })();
@@ -18,10 +19,14 @@
   function Uploader($q, File) {
 
     function Uploader(options) {
+      options = options || {};
+
       this.files = [];
       this.multi = options.multi || true;
       this.locked = options.locked || false;
-      this.urlPresigner = options.urlPresigner;
+      this.fileEndpoint = options.fileEndpoint || null;
+      this.queryUrl = options.queryUrl || null;
+      this.urlPresigner = options.urlPresigner || null;
     }
 
     Uploader.prototype.add = function(files, options) {
@@ -72,6 +77,7 @@
 
       var fileOptions = {
         urlPresigner: uploader.urlPresigner,
+        fileEndpoint: uploader.fileEndpoint
       }
 
       file = new File(file, fileOptions);
@@ -129,21 +135,25 @@
     .module('ap-file-upload')
     .factory('File', File);
 
-  File.$inject = ['$q', '$http'];
+  File.$inject = ['$q', '$http', '$resource'];
 
-  function File($q, $http) {
+  function File($q, $http, $resource) {
 
     function File(data, options) {
       var file = this;
 
-      // Public properties
       file.data = data;
       file.name = data.name;
       file.locked = options.locked || false;
-      file.urlPresigner = options.urlPresigner;
 
-      // Initialize
-      file._upload();
+      var fileName = encodeURIComponent('&fileName=' + file.name);
+
+      file.$fileResource = $resource(options.fileEndpoint + fileName);
+      file.$presignResource = $resource(options.urlPresigner + fileName);
+
+      if (!file.locked) {
+        file._upload();
+      }
 
       return file;
     }
@@ -161,7 +171,14 @@
     }
 
     File.prototype.remove = function() {
-      this.onRemove(this);
+      this._deleteFileRecord()
+
+      .then(function(){
+        this.onRemove(this);
+      })
+
+      .catch(function(){
+      })
     }
 
     File.prototype.onRemove = function() { /* noop */ }
@@ -172,27 +189,6 @@
     // Private methods
     //
 
-    File.prototype._getPresignedUrl = function() {
-      var deferred = $q.defer();
-      var name = encodeURIComponent('&fileName=' + this.name);
-      var url = this.urlPresigner + name;
-
-      $http({
-        method: 'GET',
-        url: url
-      })
-
-      .success(function(data){
-        deferred.resolve(data);
-      })
-
-      .error(function(data){
-        deferred.reject()
-      });
-
-      return deferred.promise;
-    };
-
     File.prototype._upload = function() {
       var file = this;
 
@@ -202,28 +198,41 @@
       file._getPresignedUrl()
 
       .then(function(data) {
-        console.log('success', data);
+        console.log(data);
         var preSignedUrlUpload = data.result.content.preSignedUrlUpload;
         var xhr = file._xhr = new XMLHttpRequest();
         var formData = new FormData();
 
-        formData.append('file', file.data);
+        console.log(file.data);
+        formData.append(file.data.name, file.data);
 
         xhr.upload.onprogress = file._onProgress.bind(file);
         xhr.onload = file._onLoad.bind(file);
         xhr.onerror = file._onError.bind(file);
         xhr.onabort = file._onAbort.bind(file);
 
-        xhr.open('POST', preSignedUrlUpload, true);
+        xhr.open('PUT', preSignedUrlUpload, true);
+        xhr.setRequestHeader('Content-Type', 'multipart/form-data');
         xhr.send(formData);
       })
 
       .catch(function(data) {
-        console.log('error', data);
         file.status = 'failed';
         file.onFailure(response);
       })
       
+    };
+
+    File.prototype._createFileRecord = function() {
+      return this.$fileResource.save().$promise;
+    };
+
+    File.prototype._deleteFileRecord = function() {
+      return this.$fileResource.save().$promise;
+    };
+
+    File.prototype._getPresignedUrl = function() {
+      return this.$presignResource.get().$promise;
     };
 
     File.prototype._onProgress = function(e) {
@@ -339,6 +348,7 @@
         multiple: '@',
         locked: '@',
         queryUrl: '@',
+        fileEndpoint: '@',
         urlPresigner: '@',
         status: '='
       },
@@ -368,6 +378,8 @@
     else vm.multiple = true;
 
     vm.uploader = new Uploader({
+      fileEndpoint: $scope.fileEndpoint,
+      queryUrl: $scope.queryUrl,
       urlPresigner: $scope.urlPresigner
     });
 

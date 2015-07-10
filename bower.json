@@ -13,7 +13,8 @@
     "appirio-tech-api-schemas": "git@github.com:appirio-tech/api-schemas#2.x.x"
   },
   "dependencies": {
-    "angular": "^1.4.x",
+    "angular": "1.4.x",
+    "angular-resource": "1.4.x",
     "appirio-tech-ng-auth": "git@github.com:appirio-tech/ng-auth#0.x.x"
   },
   "ignore": [

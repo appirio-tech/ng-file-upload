@@ -10,10 +10,14 @@
   function Uploader($q, File) {
 
     function Uploader(options) {
+      options = options || {};
+
       this.files = [];
       this.multi = options.multi || true;
       this.locked = options.locked || false;
-      this.urlPresigner = options.urlPresigner;
+      this.fileEndpoint = options.fileEndpoint || null;
+      this.queryUrl = options.queryUrl || null;
+      this.urlPresigner = options.urlPresigner || null;
     }
 
     Uploader.prototype.add = function(files, options) {
@@ -64,6 +68,7 @@
 
       var fileOptions = {
         urlPresigner: uploader.urlPresigner,
+        fileEndpoint: uploader.fileEndpoint
       }
 
       file = new File(file, fileOptions);

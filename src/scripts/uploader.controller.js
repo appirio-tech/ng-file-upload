@@ -15,6 +15,8 @@
     else vm.multiple = true;
 
     vm.uploader = new Uploader({
+      fileEndpoint: $scope.fileEndpoint,
+      queryUrl: $scope.queryUrl,
       urlPresigner: $scope.urlPresigner
     });
 
