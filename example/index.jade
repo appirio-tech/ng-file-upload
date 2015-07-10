@@ -1,5 +1,7 @@
 - var scripts = []
+- scripts.push('constants')
 - scripts.push('example-app.module')
+- scripts.push('example-app.controller')
 
 - scripts.push('ap-file-upload.module')
 - scripts.push('templates')
@@ -15,13 +17,20 @@
 
 - var bowers = []
 - bowers.push('angular/angular')
+- bowers.push('angular-resource/angular-resource')
+- bowers.push('angular-ui-router/release/angular-ui-router')
+- bowers.push('appirio-tech-ng-auth/dist/main')
+- bowers.push('auth0.js/build/auth0')
+- bowers.push('auth0-angular/build/auth0-angular')
+- bowers.push('a0-angular-storage/dist/angular-storage')
+- bowers.push('angular-jwt/dist/angular-jwt')
 
 - var cssPaths   = ['uploader']
 - var landscapes = []
 - var desktops   = []
 
 doctype html
-html(ng-app="example-app")
+html(ng-app="example-app", ng-controller="ExampleAppController as vm")
   head
     script(type="text/javascript", src="/bower_components/sinon/index.js")
     script(type="text/javascript", src="/bower_components/auto-config-fake-server/dist/auto-config-fake-server.js")
@@ -50,8 +59,16 @@ html(ng-app="example-app")
       link(href="styles/#{path}.desktop.css", rel="stylesheet", media="(min-width: 767px)")
 
   body
-    ap-uploader(multiple="true")
 
+    form(ng-hide="vm.authenticated", ng-submit="vm.login(this)")
+      input(type="text", name="username", placeholder="username", ng-model="vm.username")
+      input(type="password", name="password", placeholder="password", ng-model="vm.password")
+      button(type="submit") Login
+
+    | {{ vm.uploaderStatus }}
+    
+    ap-uploader(multiple="true", url-presigner="http://api.topcoder-dev.com/v3/workrequestfiles/uploadurl?filter=workRequestId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe%26assetType%3Dspecs", status="vm.uploaderStatus")
+    
     each path in bowers
       script(src="bower_components/#{path}.js", type="text/javascript")
 

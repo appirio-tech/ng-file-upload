@@ -13,6 +13,7 @@
       this.files = [];
       this.multi = options.multi || true;
       this.locked = options.locked || false;
+      this.urlPresigner = options.urlPresigner;
     }
 
     Uploader.prototype.add = function(files, options) {
@@ -39,19 +40,17 @@
       var dupePosition = uploader._indexOfFilename(file.name); 
       var dupe = dupePosition >= 0;
 
-      file = uploader._newFile(file, options);
-
       if (dupe) {
         if (replace) {
-          uploader.files[dupePosition] = file;
+          uploader.files[dupePosition] = uploader._newFile(file, options);
         } else {
           deferred.reject('DUPE');
         }
       } else {
         if (uploader.multi) {
-          uploader.files.push(file);
+          uploader.files.push(uploader._newFile(file, options));
         } else {
-          uploader.files[0] = file;
+          uploader.files[0] = uploader._newFile(file, options);
         }
       }
 
@@ -62,9 +61,12 @@
 
     Uploader.prototype._newFile = function(file, options) {
       var uploader = this;
-      file = new File(file, uploader, {
-        locked: uploader.locked
-      });
+
+      var fileOptions = {
+        urlPresigner: uploader.urlPresigner,
+      }
+
+      file = new File(file, fileOptions);
 
       file.onSuccess = function(response) {
         uploader.onUpdate();

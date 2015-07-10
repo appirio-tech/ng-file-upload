@@ -1,7 +1,9 @@
 (function () {
   'use strict';
 
-  angular.module('ap-file-upload', []);
+  angular.module('ap-file-upload', [
+    'appirio-tech-ng-auth'
+  ]);
 
 })();
 (function () {
@@ -131,35 +133,6 @@
 
   function File($q, $http) {
 
-    var mockPresign = {
-      "id": "44912af3:14e2958afa0:-7fee",
-      "result": {
-        "success": true,
-        "status": 200,
-        "metadata": null,
-        "content": {
-          "fileId": null,
-          "modifiedBy": null,
-          "modifiedAt": null,
-          "createdBy": null,
-          "createdAt": null,
-          "workId": "12345",
-          "ownerId": null,
-          "userId": "40135374",
-          "fileName": "test.jpg",
-          "filePath": "Design/40135374/12345/specs/test.jpg",
-          "fileType": null,
-          "fileSize": null,
-          "fileHash": null,
-          "assetType": "specs",
-          "preSignedUrlUpload": "https://topcoder-dev-media.s3.amazonaws.com/Design/40135374/12345/specs/test.jpg?AWSAccessKeyId=AKIAIXSUWK5FC3PKNXFA&Expires=1435216617&Signature=aFjTrsFicz%2FLzzyIqCGOfTKNdCw%3D",
-          "preSignedUrlDownload": null,
-          "version": 0
-        }
-      },
-      "version": "v3"
-    }
-
     function File(data, options) {
       var file = this;
 
@@ -170,21 +143,7 @@
       file.urlPresigner = options.urlPresigner;
 
       // Initialize
-      file.status = 'started';
-      file.progress = 0;
-      file._getPresignedUrl()
-
-      .then(function(data) {
-        file.preSignedUrlUpload = data.result.content.preSignedUrlUpload;
-        console.log('success', data);
-        file._upload();
-      })
-
-      .catch(function(data) {
-        console.log('error', data);
-        file.status = 'failed';
-        file.onFailure(response);
-      })
+      file._upload();
 
       return file;
     }
@@ -218,8 +177,6 @@
       var name = encodeURIComponent('&fileName=' + this.name);
       var url = this.urlPresigner + name;
 
-      deferred.resolve(mockPresign);
-
       $http({
         method: 'GET',
         url: url
@@ -238,22 +195,35 @@
 
     File.prototype._upload = function() {
       var file = this;
-      var xhr = file._xhr = new XMLHttpRequest();
-      var formData = new FormData();
-      var url = file.preSignedUrlUpload;
-
-      formData.append('file', file.data);
-
-      xhr.upload.onprogress = file._onProgress.bind(file);
-      xhr.onload = file._onLoad.bind(file);
-      xhr.onerror = file._onError.bind(file);
-      xhr.onabort = file._onAbort.bind(file);
 
       file.status = 'started';
       file.progress = 0;
 
-      xhr.open('POST', url, true);
-      xhr.send(formData);
+      file._getPresignedUrl()
+
+      .then(function(data) {
+        console.log('success', data);
+        var preSignedUrlUpload = data.result.content.preSignedUrlUpload;
+        var xhr = file._xhr = new XMLHttpRequest();
+        var formData = new FormData();
+
+        formData.append('file', file.data);
+
+        xhr.upload.onprogress = file._onProgress.bind(file);
+        xhr.onload = file._onLoad.bind(file);
+        xhr.onerror = file._onError.bind(file);
+        xhr.onabort = file._onAbort.bind(file);
+
+        xhr.open('POST', preSignedUrlUpload, true);
+        xhr.send(formData);
+      })
+
+      .catch(function(data) {
+        console.log('error', data);
+        file.status = 'failed';
+        file.onFailure(response);
+      })
+      
     };
 
     File.prototype._onProgress = function(e) {
@@ -442,6 +412,3 @@
   }
   
 })();
-
-angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"vm.file.status\"><span>{{vm.file.name}}</span><button ng-show=\"vm.file.status == \'started\'\" ng-click=\"vm.file.cancel()\">Cancel</button><button ng-show=\"vm.file.status == \'succeeded\' || vm.file.status == \'failed\'\" ng-click=\"vm.file.remove()\">Remove</button><button ng-show=\"vm.file.status == \'failed\'\" ng-click=\"vm.file.retry()\">Retry</button><progress ng-show=\"vm.file.status == \'started\'\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress></div>");
-$templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.multiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.multiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);

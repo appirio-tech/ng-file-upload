@@ -11,11 +11,14 @@
         multiple: '@',
         locked: '@',
         queryUrl: '@',
-        presignedUrl: '@',
-        uploadUrl: '@'
+        urlPresigner: '@',
+        status: '='
       },
       controller: 'UploaderController as vm',
-      templateUrl: 'uploader.html'
+      templateUrl: 'uploader.html',
+      link: function($scope, $element, $attrs) {
+        $scope.status = 'yo';
+      }
     }
   };
 

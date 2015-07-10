@@ -9,14 +9,14 @@
 
   function File($q, $http) {
 
-    function File(data, uploader, options) {
+    function File(data, options) {
       var file = this;
 
       // Public properties
       file.data = data;
       file.name = data.name;
-      file.status = 'created';
       file.locked = options.locked || false;
+      file.urlPresigner = options.urlPresigner;
 
       // Initialize
       file._upload();
@@ -48,23 +48,58 @@
     // Private methods
     //
 
+    File.prototype._getPresignedUrl = function() {
+      var deferred = $q.defer();
+      var name = encodeURIComponent('&fileName=' + this.name);
+      var url = this.urlPresigner + name;
+
+      $http({
+        method: 'GET',
+        url: url
+      })
+
+      .success(function(data){
+        deferred.resolve(data);
+      })
+
+      .error(function(data){
+        deferred.reject()
+      });
+
+      return deferred.promise;
+    };
+
     File.prototype._upload = function() {
       var file = this;
-      var xhr = file._xhr = new XMLHttpRequest();
-      var formData = new FormData();
-
-      formData.append('file', file.data);
-
-      xhr.upload.onprogress = file._onProgress.bind(file);
-      xhr.onload = file._onLoad.bind(file);
-      xhr.onerror = file._onError.bind(file);
-      xhr.onabort = file._onAbort.bind(file);
 
       file.status = 'started';
       file.progress = 0;
 
-      xhr.open('POST', 'http://localhost:5000/delay/3000', true);
-      xhr.send(formData);
+      file._getPresignedUrl()
+
+      .then(function(data) {
+        console.log('success', data);
+        var preSignedUrlUpload = data.result.content.preSignedUrlUpload;
+        var xhr = file._xhr = new XMLHttpRequest();
+        var formData = new FormData();
+
+        formData.append('file', file.data);
+
+        xhr.upload.onprogress = file._onProgress.bind(file);
+        xhr.onload = file._onLoad.bind(file);
+        xhr.onerror = file._onError.bind(file);
+        xhr.onabort = file._onAbort.bind(file);
+
+        xhr.open('POST', preSignedUrlUpload, true);
+        xhr.send(formData);
+      })
+
+      .catch(function(data) {
+        console.log('error', data);
+        file.status = 'failed';
+        file.onFailure(response);
+      })
+      
     };
 
     File.prototype._onProgress = function(e) {

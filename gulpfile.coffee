@@ -38,6 +38,15 @@ configs.karma =
 configs.fixtureFiles = [
 ]
 
+configs.constants =
+  API_URL       : 'https://api.topcoder-dev.com/v3'
+  API_URL_V2    : 'https://api.topcoder-dev.com/v2'
+  AVATAR_URL    : 'http://www.topcoder.com'
+  SUBMISSION_URL: 'https://studio.topcoder.com  '
+  AUTH0_CLIENT_ID : 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT'
+  AUTH0_DOMAIN    : 'topcoder-dev.auth0.com'
+  AUTH0_TOKEN_NAME: 'userJWTToken'
+
 configs.templateCache =
   files : [
     '.tmp/views/**/*.html'
@@ -61,7 +70,6 @@ configs.buildFiles =
       'src/scripts/uploader.controller.js'
       'src/scripts/file.directive.js'
       'src/scripts/file.controller.js'
-      '.tmp/scripts/templates.js'
     ]
     'main.css': [
       '.tmp/styles/**/*.css'

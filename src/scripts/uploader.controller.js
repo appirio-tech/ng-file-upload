@@ -15,6 +15,7 @@
     else vm.multiple = true;
 
     vm.uploader = new Uploader({
+      urlPresigner: $scope.urlPresigner
     });
 
     vm.uploader.onUpdate = function() {

@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
-  angular.module('ap-file-upload', []);
+  angular.module('ap-file-upload', [
+    'appirio-tech-ng-auth'
+  ]);
 
 })();

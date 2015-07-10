@@ -1,6 +1,13 @@
-# Messaging
+# Appirio File Uploader
 
-## Docs
+## Developing on the repo
 
-### API
+Clone the repo:
+```
+bower install --save ap-file-upload
+```
+
+- Update ``AUTH0_CLIENT_ID`` in ``gulpfile.coffee``
+
+## API Reference
 http://docs.apworkmicroservice.apiary.io/#reference/workrequestfiles
