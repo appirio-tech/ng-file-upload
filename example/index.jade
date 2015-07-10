@@ -67,7 +67,7 @@ html(ng-app="example-app", ng-controller="ExampleAppController as vm")
 
     | {{ vm.uploaderStatus }}
     
-    ap-uploader(multiple="true", url-presigner="http://api.topcoder-dev.com/v3/workrequestfiles/uploadurl?filter=workRequestId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe%26assetType%3Dspecs", status="vm.uploaderStatus")
+    ap-uploader(multiple="true", url-presigner="{{ vm.presignerUrl }}", status="vm.uploaderStatus")
     
     each path in bowers
       script(src="bower_components/#{path}.js", type="text/javascript")
