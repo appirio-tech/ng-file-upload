@@ -15,7 +15,7 @@
   "dependencies": {
     "angular": "1.4.x",
     "angular-resource": "1.4.x",
-    "appirio-tech-ng-auth": "git@github.com:appirio-tech/ng-auth#0.x.x"
+    "appirio-tech-ng-auth": "git@github.com:appirio-tech/ng-auth#1.x.x"
   },
   "ignore": [
     "**/*",
