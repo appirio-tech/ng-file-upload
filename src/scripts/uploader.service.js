@@ -5,9 +5,9 @@
     .module('ap-file-upload')
     .factory('Uploader', Uploader);
 
-  Uploader.$inject = ['$q', 'File'];
+  Uploader.$inject = ['$q', 'File', '$resource'];
   /* @ngInject */
-  function Uploader($q, File) {
+  function Uploader($q, File, $resource) {
 
     function Uploader(options) {
       options = options || {};
@@ -18,6 +18,12 @@
       this.fileEndpoint = options.fileEndpoint || null;
       this.queryUrl = options.queryUrl || null;
       this.urlPresigner = options.urlPresigner || null;
+      this.$fileResource = $resource(this.fileEndpoint);
+      this.$presignResource = $resource(this.urlPresigner);
+
+      if (this.queryUrl) {
+        this._populate();
+      }
     }
 
     Uploader.prototype.add = function(files, options) {
@@ -38,6 +44,7 @@
     Uploader.prototype.onUpdate = function() {}
 
     Uploader.prototype._add = function(file, options) {
+      options = options || {};
       var deferred = $q.defer();
       var uploader = this;
       var replace = options.replace || false;
@@ -63,15 +70,35 @@
       return deferred.promise;
     }
 
+    Uploader.prototype._populate = function() {
+      var uploader = this;
+      var $promise = $resource(uploader.queryUrl).get().$promise;
+
+      $promise.then(function(data) {
+        var files = data.result.content || [];
+
+        files.forEach(function(file) {
+          uploader._add({
+            name: file.fileName
+          }, {
+            newFile: false,
+            fileId: file.fileId
+          })
+        });
+      })
+    }
+
     Uploader.prototype._newFile = function(file, options) {
       var uploader = this;
 
-      var fileOptions = {
-        urlPresigner: uploader.urlPresigner,
-        fileEndpoint: uploader.fileEndpoint
-      }
+      options.$presignResource = uploader.$presignResource;
+      options.$fileResource = uploader.$fileResource;
 
-      file = new File(file, fileOptions);
+      file = new File(file, options);
+
+      file.onProgress = function(response) {
+        uploader.onUpdate();
+      };
 
       file.onSuccess = function(response) {
         uploader.onUpdate();

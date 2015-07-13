@@ -2,7 +2,6 @@
   'use strict';
 
   angular.module('ap-file-upload', [
-    'appirio-tech-ng-auth',
     'ngResource'
   ]);
 
@@ -14,9 +13,9 @@
     .module('ap-file-upload')
     .factory('Uploader', Uploader);
 
-  Uploader.$inject = ['$q', 'File'];
+  Uploader.$inject = ['$q', 'File', '$resource'];
   /* @ngInject */
-  function Uploader($q, File) {
+  function Uploader($q, File, $resource) {
 
     function Uploader(options) {
       options = options || {};
@@ -27,6 +26,12 @@
       this.fileEndpoint = options.fileEndpoint || null;
       this.queryUrl = options.queryUrl || null;
       this.urlPresigner = options.urlPresigner || null;
+      this.$fileResource = $resource(this.fileEndpoint);
+      this.$presignResource = $resource(this.urlPresigner);
+
+      if (this.queryUrl) {
+        this._populate();
+      }
     }
 
     Uploader.prototype.add = function(files, options) {
@@ -47,6 +52,7 @@
     Uploader.prototype.onUpdate = function() {}
 
     Uploader.prototype._add = function(file, options) {
+      options = options || {};
       var deferred = $q.defer();
       var uploader = this;
       var replace = options.replace || false;
@@ -72,15 +78,35 @@
       return deferred.promise;
     }
 
+    Uploader.prototype._populate = function() {
+      var uploader = this;
+      var $promise = $resource(uploader.queryUrl).get().$promise;
+
+      $promise.then(function(data) {
+        var files = data.result.content || [];
+
+        files.forEach(function(file) {
+          uploader._add({
+            name: file.fileName
+          }, {
+            newFile: false,
+            fileId: file.fileId
+          })
+        });
+      })
+    }
+
     Uploader.prototype._newFile = function(file, options) {
       var uploader = this;
 
-      var fileOptions = {
-        urlPresigner: uploader.urlPresigner,
-        fileEndpoint: uploader.fileEndpoint
-      }
+      options.$presignResource = uploader.$presignResource;
+      options.$fileResource = uploader.$fileResource;
 
-      file = new File(file, fileOptions);
+      file = new File(file, options);
+
+      file.onProgress = function(response) {
+        uploader.onUpdate();
+      };
 
       file.onSuccess = function(response) {
         uploader.onUpdate();
@@ -135,24 +161,25 @@
     .module('ap-file-upload')
     .factory('File', File);
 
-  File.$inject = ['$q', '$http', '$resource'];
+  File.$inject = ['$q', '$http'];
 
-  function File($q, $http, $resource) {
+  function File($q, $http) {
 
     function File(data, options) {
       var file = this;
 
       file.data = data;
       file.name = data.name;
+      file.newFile = options.newFile !== false;
       file.locked = options.locked || false;
+      file.$fileResource = options.$fileResource;
+      file.$presignResource = options.$presignResource;
 
-      var fileName = encodeURIComponent('&fileName=' + file.name);
-
-      file.$fileResource = $resource(options.fileEndpoint + fileName);
-      file.$presignResource = $resource(options.urlPresigner + fileName);
-
-      if (!file.locked) {
+      if (file.newFile) {
         file._upload();
+      } else {
+        file.fileId = options.fileId;
+        file.status = 'succeeded';
       }
 
       return file;
@@ -171,17 +198,20 @@
     }
 
     File.prototype.remove = function() {
-      this._deleteFileRecord()
+      var file = this;
 
-      .then(function(){
-        this.onRemove(this);
-      })
+      var $promise = file._deleteFileRecord();
 
-      .catch(function(){
-      })
+      $promise.then(function(){
+        file.onRemove(file);
+      });
+
+      $promise.catch(function(){
+      });
     }
 
     File.prototype.onRemove = function() { /* noop */ }
+    File.prototype.onProgress = function() { /* noop */ }
     File.prototype.onSuccess = function() { /* noop */ }
     File.prototype.onFailure = function() { /* noop */ }
 
@@ -195,15 +225,14 @@
       file.status = 'started';
       file.progress = 0;
 
-      file._getPresignedUrl()
+      var $promise = file._getPresignedUrl();
 
-      .then(function(data) {
-        console.log(data);
-        var preSignedUrlUpload = data.result.content.preSignedUrlUpload;
+      $promise.then(function(data) {
+        file.preSignedUrlUpload = data.result.content.preSignedUrlUpload;
+
         var xhr = file._xhr = new XMLHttpRequest();
         var formData = new FormData();
 
-        console.log(file.data);
         formData.append(file.data.name, file.data);
 
         xhr.upload.onprogress = file._onProgress.bind(file);
@@ -211,28 +240,40 @@
         xhr.onerror = file._onError.bind(file);
         xhr.onabort = file._onAbort.bind(file);
 
-        xhr.open('PUT', preSignedUrlUpload, true);
+        xhr.open('PUT', file.preSignedUrlUpload, true);
         xhr.setRequestHeader('Content-Type', 'multipart/form-data');
         xhr.send(formData);
-      })
+      });
 
-      .catch(function(data) {
+      $promise.catch(function(data) {
         file.status = 'failed';
         file.onFailure(response);
-      })
+      });
       
     };
 
     File.prototype._createFileRecord = function() {
-      return this.$fileResource.save().$promise;
+      return this.$fileResource.save({
+        param: {
+          workRequestId: "1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe",
+          fileName: this.data.name,
+          fileType: this.data.type,
+          fileSize: this.data.size,
+          assetType: "specs"        
+        }
+      }).$promise;
     };
 
     File.prototype._deleteFileRecord = function() {
-      return this.$fileResource.save().$promise;
+      return this.$fileResource.delete({
+        fileId: this.fileId
+      }).$promise;
     };
 
     File.prototype._getPresignedUrl = function() {
-      return this.$presignResource.get().$promise;
+      return this.$presignResource.get({
+        name: this.name
+      }).$promise;
     };
 
     File.prototype._onProgress = function(e) {
@@ -240,15 +281,29 @@
     }
 
     File.prototype._onLoad = function() {
-      var response = this._transformResponse(this._xhr);
+      var file = this;
+      var response = file._transformResponse(file._xhr);
 
-      if (this._isSuccessCode(this._xhr.status)) {
-        this.status = 'succeeded';
-        this.onSuccess(response);
+      if (file._isSuccessCode(file._xhr.status)) {
+
+        var $promise = file._createFileRecord();
+
+        $promise.then(function(data) {
+          file.fileId = data.result.content.fileId;
+          file.status = 'succeeded';
+          file.onSuccess(response);
+        });
+
+        $promise.catch(function() {
+          file.status = 'failed';
+          file.onFailure(response);
+        });
+
       } else {
-        this.status = 'failed';
-        this.onFailure(response);
+        file.status = 'failed';
+        file.onFailure(response);
       }
+
     }
 
     File.prototype._onError = function() {
@@ -257,7 +312,7 @@
     }
 
     File.prototype._onAbort = function() {
-      this.remove();
+      this.onRemove(this);
     }
 
     //
@@ -384,7 +439,7 @@
     });
 
     vm.uploader.onUpdate = function() {
-      $scope.$apply();
+      // $scope.$apply();
     }
 
   }

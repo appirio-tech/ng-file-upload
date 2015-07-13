@@ -23,39 +23,16 @@
 
     vm.uploaderStatus = 'pristine';
 
-    vm.queryUrl = formatUrl({
-      domain: 'http://192.168.1.126:8080/v3/',
-      path: 'workrequestfiles',
-      filters: {
-        workRequestId: '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
-      }
-    });
+    // var domain = 'http://api.topcoder-dev.com';
+    var domain = 'http://192.168.1.126:8080';
+    var workRequestId = '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe';
+    var assetType = 'specs';
 
-    vm.fileEndpoint = formatUrl({
-      domain: 'http://192.168.1.126:8080/v3/',
-      path: 'workrequestfiles',
-      filters: {
-        workRequestId: '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
-      }
-    });
+    vm.queryUrl = domain + '/v3/workrequestfiles?filter=workRequestId%3D' + workRequestId + '%26assetType%3D' + assetType;
 
-    vm.presignerUrl = formatUrl({
-      domain: 'http://192.168.1.126:8080/v3/',
-      path: 'workrequestfiles/uploadurl',
-      filters: {
-        workRequestId: '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
-        assetType: 'specs'
-      }
-    });
+    vm.presignerUrl = domain + '/v3/workrequestfiles/uploadurl?filter=workRequestId%3D' + workRequestId + '%26assetType%3D' + assetType + '%26fileName%3D:name';
 
-    function formatUrl(params) {
-      var filterArray = [];
-      for (var key in params.filters) {
-        filterArray.push(key + '=' + params.filters[key])
-      }
-      var filterString = '?filter=' + encodeURIComponent(filterArray.join('&'));
-      return params.domain + params.path + filterString;
-    }
+    vm.fileEndpoint = domain + '/v3/workrequestfiles/:fileId?filter=workRequestId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe';
   }
   
 })();

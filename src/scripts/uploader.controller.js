@@ -21,7 +21,7 @@
     });
 
     vm.uploader.onUpdate = function() {
-      $scope.$apply();
+      // $scope.$apply();
     }
 
   }
