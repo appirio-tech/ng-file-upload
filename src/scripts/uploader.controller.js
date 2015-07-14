@@ -9,16 +9,14 @@
 
   function UploaderController($scope, Uploader) {
     var vm = this;
-
-    if ($scope.multiple === 'true') vm.multiple = true;
-    else if ($scope.multiple === 'false') vm.multiple = false;
-    else vm.multiple = true;
+    vm.multiple = $scope.config.multiple;
 
     vm.uploader = new Uploader({
-      multi: vm.multiple,
-      fileEndpoint: $scope.fileEndpoint,
-      queryUrl: $scope.queryUrl,
-      urlPresigner: $scope.urlPresigner
+      allowMultiple: $scope.config.allowMultiple,
+      fileEndpoint: $scope.config.fileEndpoint,
+      queryUrl: $scope.config.queryUrl,
+      urlPresigner: $scope.config.urlPresigner,
+      saveParams: $scope.config.saveParams,
     });
 
   }

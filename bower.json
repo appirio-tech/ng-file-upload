@@ -1,6 +1,6 @@
 {
   "name": "Appirio File Upload",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "File upload widget for use with S3 presigned urls",
   "license": "MIT",
   "authors": [

@@ -8,18 +8,11 @@
   function apUploader() {
     return {
       scope: {
-        multiple: '@',
-        locked: '@',
-        queryUrl: '@',
-        fileEndpoint: '@',
-        urlPresigner: '@',
-        status: '='
+        status: '=',
+        config: '='
       },
       controller: 'UploaderController as vm',
-      templateUrl: 'uploader.html',
-      link: function($scope, $element, $attrs) {
-        $scope.status = 'yo';
-      }
+      templateUrl: 'uploader.html'
     }
   };
 

@@ -21,16 +21,14 @@
       options = options || {};
 
       this.files = [];
-      this.multi = options.multi !== false;
-      this.locked = options.locked || false;
-      this.fileEndpoint = options.fileEndpoint || null;
-      this.queryUrl = options.queryUrl || null;
-      this.urlPresigner = options.urlPresigner || null;
-      this.$fileResource = $resource(this.fileEndpoint);
-      this.$presignResource = $resource(this.urlPresigner);
+      this.allowMultiple = options.allowMultiple || false;
+      this.allowDuplicates = options.allowDuplicates || false;
+      this.$fileResource = $resource(options.fileEndpoint);
+      this.$presignResource = $resource(options.urlPresigner);
+      this.saveParams = options.saveParams || {};
 
-      if (this.queryUrl) {
-        this._populate();
+      if (options.queryUrl) {
+        this._populate(options.queryUrl);
       }
     }
 
@@ -40,7 +38,7 @@
       files = filelistToArray(files);
 
       // Fail if we're trying to add multiple files to a single upload
-      if (files.length > 1 && uploader.multi === false) {
+      if (files.length > 1 && uploader.allowMultiple === false) {
         deferred.reject('NOTMULTI');
       }
 
@@ -68,7 +66,7 @@
           deferred.reject('DUPE');
         }
       } else {
-        if (uploader.multi) {
+        if (uploader.allowMultiple) {
           uploader.files.push(uploader._newFile(file, options));
         } else {
           if (uploader.files[0]) {
@@ -86,9 +84,9 @@
       return deferred.promise;
     }
 
-    Uploader.prototype._populate = function() {
+    Uploader.prototype._populate = function(queryUrl) {
       var uploader = this;
-      var $promise = $resource(uploader.queryUrl).get().$promise;
+      var $promise = $resource(queryUrl).get().$promise;
 
       $promise.then(function(data) {
         var files = data.result.content || [];
@@ -109,6 +107,7 @@
 
       options.$presignResource = uploader.$presignResource;
       options.$fileResource = uploader.$fileResource;
+      options.saveParams = uploader.saveParams;
 
       file = new File(file, options);
 
@@ -182,6 +181,11 @@
       file.locked = options.locked || false;
       file.$fileResource = options.$fileResource;
       file.$presignResource = options.$presignResource;
+
+      file.saveParams = angular.copy(options.saveParams);
+      file.saveParams.fileName = file.data.name;
+      file.saveParams.fileType = file.data.type;
+      file.saveParams.fileSize = file.data.size;
 
       if (file.newFile) {
         file._upload();
@@ -266,15 +270,7 @@
     };
 
     File.prototype._createFileRecord = function() {
-      return this.$fileResource.save({
-        param: {
-          workRequestId: "1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe",
-          fileName: this.data.name,
-          fileType: this.data.type,
-          fileSize: this.data.size,
-          assetType: "specs"        
-        }
-      }).$promise;
+      return this.$fileResource.save(this.saveParams).$promise;
     };
 
     File.prototype._deleteFileRecord = function() {
@@ -413,18 +409,11 @@
   function apUploader() {
     return {
       scope: {
-        multiple: '@',
-        locked: '@',
-        queryUrl: '@',
-        fileEndpoint: '@',
-        urlPresigner: '@',
-        status: '='
+        status: '=',
+        config: '='
       },
       controller: 'UploaderController as vm',
-      templateUrl: 'uploader.html',
-      link: function($scope, $element, $attrs) {
-        $scope.status = 'yo';
-      }
+      templateUrl: 'uploader.html'
     }
   };
 
@@ -440,16 +429,14 @@
 
   function UploaderController($scope, Uploader) {
     var vm = this;
-
-    if ($scope.multiple === 'true') vm.multiple = true;
-    else if ($scope.multiple === 'false') vm.multiple = false;
-    else vm.multiple = true;
+    vm.multiple = $scope.config.multiple;
 
     vm.uploader = new Uploader({
-      multi: vm.multiple,
-      fileEndpoint: $scope.fileEndpoint,
-      queryUrl: $scope.queryUrl,
-      urlPresigner: $scope.urlPresigner
+      allowMultiple: $scope.config.allowMultiple,
+      fileEndpoint: $scope.config.fileEndpoint,
+      queryUrl: $scope.config.queryUrl,
+      urlPresigner: $scope.config.urlPresigner,
+      saveParams: $scope.config.saveParams,
     });
 
   }
@@ -491,4 +478,4 @@
 })();
 
 angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"vm.file.status\"><span>{{vm.file.name}}</span><button ng-show=\"vm.file.status == \'started\'\" ng-click=\"vm.file.cancel()\">Cancel</button><button ng-show=\"vm.file.status == \'succeeded\' || vm.file.status == \'failed\'\" ng-click=\"vm.file.remove()\">Remove</button><button ng-show=\"vm.file.status == \'failed\'\" ng-click=\"vm.file.retry()\">Retry</button><progress ng-show=\"vm.file.status == \'started\'\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress></div>");
-$templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.multiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.multiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
+$templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);

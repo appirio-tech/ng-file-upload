@@ -13,16 +13,14 @@
       options = options || {};
 
       this.files = [];
-      this.multi = options.multi !== false;
-      this.locked = options.locked || false;
-      this.fileEndpoint = options.fileEndpoint || null;
-      this.queryUrl = options.queryUrl || null;
-      this.urlPresigner = options.urlPresigner || null;
-      this.$fileResource = $resource(this.fileEndpoint);
-      this.$presignResource = $resource(this.urlPresigner);
+      this.allowMultiple = options.allowMultiple || false;
+      this.allowDuplicates = options.allowDuplicates || false;
+      this.$fileResource = $resource(options.fileEndpoint);
+      this.$presignResource = $resource(options.urlPresigner);
+      this.saveParams = options.saveParams || {};
 
-      if (this.queryUrl) {
-        this._populate();
+      if (options.queryUrl) {
+        this._populate(options.queryUrl);
       }
     }
 
@@ -32,7 +30,7 @@
       files = filelistToArray(files);
 
       // Fail if we're trying to add multiple files to a single upload
-      if (files.length > 1 && uploader.multi === false) {
+      if (files.length > 1 && uploader.allowMultiple === false) {
         deferred.reject('NOTMULTI');
       }
 
@@ -60,7 +58,7 @@
           deferred.reject('DUPE');
         }
       } else {
-        if (uploader.multi) {
+        if (uploader.allowMultiple) {
           uploader.files.push(uploader._newFile(file, options));
         } else {
           if (uploader.files[0]) {
@@ -78,9 +76,9 @@
       return deferred.promise;
     }
 
-    Uploader.prototype._populate = function() {
+    Uploader.prototype._populate = function(queryUrl) {
       var uploader = this;
-      var $promise = $resource(uploader.queryUrl).get().$promise;
+      var $promise = $resource(queryUrl).get().$promise;
 
       $promise.then(function(data) {
         var files = data.result.content || [];
@@ -101,6 +99,7 @@
 
       options.$presignResource = uploader.$presignResource;
       options.$fileResource = uploader.$fileResource;
+      options.saveParams = uploader.saveParams;
 
       file = new File(file, options);
 
