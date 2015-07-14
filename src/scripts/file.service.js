@@ -19,6 +19,11 @@
       file.$fileResource = options.$fileResource;
       file.$presignResource = options.$presignResource;
 
+      file.saveParams = angular.copy(options.saveParams);
+      file.saveParams.fileName = file.data.name;
+      file.saveParams.fileType = file.data.type;
+      file.saveParams.fileSize = file.data.size;
+
       if (file.newFile) {
         file._upload();
       } else {
@@ -102,15 +107,7 @@
     };
 
     File.prototype._createFileRecord = function() {
-      return this.$fileResource.save({
-        param: {
-          workRequestId: "1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe",
-          fileName: this.data.name,
-          fileType: this.data.type,
-          fileSize: this.data.size,
-          assetType: "specs"        
-        }
-      }).$promise;
+      return this.$fileResource.save(this.saveParams).$promise;
     };
 
     File.prototype._deleteFileRecord = function() {

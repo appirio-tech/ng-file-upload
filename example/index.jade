@@ -68,10 +68,7 @@ html(ng-app="example-app", ng-controller="ExampleAppController as vm")
     | {{ vm.uploaderStatus }}
     
     ap-uploader(
-      multiple="false",
-      query-url="{{ vm.queryUrl }}",
-      file-endpoint="{{ vm.fileEndpoint }}",
-      url-presigner="{{ vm.presignerUrl }}",
+      config="vm.uploaderConfig",
       status="vm.uploaderStatus"
     )
     
