@@ -13,7 +13,7 @@
       options = options || {};
 
       this.files = [];
-      this.multi = options.multi || true;
+      this.multi = options.multi !== false;
       this.locked = options.locked || false;
       this.fileEndpoint = options.fileEndpoint || null;
       this.queryUrl = options.queryUrl || null;
@@ -53,7 +53,9 @@
 
       if (dupe) {
         if (replace) {
-          uploader.files[dupePosition] = uploader._newFile(file, options);
+          uploader.files[dupePosition].remove().then(function() {
+            uploader.files[dupePosition] = uploader._newFile(file, options);
+          });
         } else {
           deferred.reject('DUPE');
         }
@@ -61,7 +63,13 @@
         if (uploader.multi) {
           uploader.files.push(uploader._newFile(file, options));
         } else {
-          uploader.files[0] = uploader._newFile(file, options);
+          if (uploader.files[0]) {
+            uploader.files[0].remove().then(function() {
+              uploader.files[0] = uploader._newFile(file, options);
+            });
+          } else {
+            uploader.files[0] = uploader._newFile(file, options);
+          }
         }
       }
 

@@ -23,7 +23,7 @@
 
     vm.uploaderStatus = 'pristine';
 
-    // var domain = 'http://api.topcoder-dev.com';
+    var domain = 'http://api.topcoder-dev.com';
     var domain = 'http://192.168.1.126:8080';
     var workRequestId = '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe';
     var assetType = 'specs';

@@ -42,16 +42,21 @@
     }
 
     File.prototype.remove = function() {
+      var deferred = $q.defer();
       var file = this;
 
       var $promise = file._deleteFileRecord();
 
       $promise.then(function(){
         file.onRemove(file);
+        deferred.resolve();
       });
 
       $promise.catch(function(){
+        deferred.reject();
       });
+
+      return deferred.promise;
     }
 
     File.prototype.onRemove = function() { /* noop */ }

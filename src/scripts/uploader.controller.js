@@ -15,14 +15,11 @@
     else vm.multiple = true;
 
     vm.uploader = new Uploader({
+      multi: vm.multiple,
       fileEndpoint: $scope.fileEndpoint,
       queryUrl: $scope.queryUrl,
       urlPresigner: $scope.urlPresigner
     });
-
-    vm.uploader.onUpdate = function() {
-      // $scope.$apply();
-    }
 
   }
   

@@ -1,21 +1,29 @@
 # Appirio File Uploader
 
+
+## Using the repo in your app
+
+### Install
+
+```
+> bower install --save 
+```
+
 ## Developing on the repo
 
 ### Install
+
 ```
 > npm install
 > bower install
-> gulp build
-> gulp serve
 ```
 
-### Setup
+### Using the example app
 
-Sign in using a valid Topcoder account in the domain you're testing.
+``gulp serve`` will start a local Browsersync server on ``localhost:9001``
 
-Modify the parameters of the ``ap-uploader`` directive in ``example/index.jade``
-. The example code in the repo currently is for attaching files to a specific work item. The work microservice requires a valid work request id and requires that you own that work request.
+### Comitting changes
 
-## API Reference
-http://docs.apworkmicroservice.apiary.io/#reference/workrequestfiles
+The bower component served by this repo only includes the dist folder, which is committed. Make sure to ``gulp build`` before adding your files 
+
+

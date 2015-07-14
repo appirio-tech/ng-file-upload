@@ -21,7 +21,7 @@
       options = options || {};
 
       this.files = [];
-      this.multi = options.multi || true;
+      this.multi = options.multi !== false;
       this.locked = options.locked || false;
       this.fileEndpoint = options.fileEndpoint || null;
       this.queryUrl = options.queryUrl || null;
@@ -61,7 +61,9 @@
 
       if (dupe) {
         if (replace) {
-          uploader.files[dupePosition] = uploader._newFile(file, options);
+          uploader.files[dupePosition].remove().then(function() {
+            uploader.files[dupePosition] = uploader._newFile(file, options);
+          });
         } else {
           deferred.reject('DUPE');
         }
@@ -69,7 +71,13 @@
         if (uploader.multi) {
           uploader.files.push(uploader._newFile(file, options));
         } else {
-          uploader.files[0] = uploader._newFile(file, options);
+          if (uploader.files[0]) {
+            uploader.files[0].remove().then(function() {
+              uploader.files[0] = uploader._newFile(file, options);
+            });
+          } else {
+            uploader.files[0] = uploader._newFile(file, options);
+          }
         }
       }
 
@@ -198,16 +206,21 @@
     }
 
     File.prototype.remove = function() {
+      var deferred = $q.defer();
       var file = this;
 
       var $promise = file._deleteFileRecord();
 
       $promise.then(function(){
         file.onRemove(file);
+        deferred.resolve();
       });
 
       $promise.catch(function(){
+        deferred.reject();
       });
+
+      return deferred.promise;
     }
 
     File.prototype.onRemove = function() { /* noop */ }
@@ -433,14 +446,11 @@
     else vm.multiple = true;
 
     vm.uploader = new Uploader({
+      multi: vm.multiple,
       fileEndpoint: $scope.fileEndpoint,
       queryUrl: $scope.queryUrl,
       urlPresigner: $scope.urlPresigner
     });
-
-    vm.uploader.onUpdate = function() {
-      // $scope.$apply();
-    }
 
   }
   
