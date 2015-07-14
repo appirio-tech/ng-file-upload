@@ -24,6 +24,7 @@
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
+      console.log(options.urlPresigner);
       this.$presignResource = $resource(options.urlPresigner);
       this.saveParams = options.saveParams || {};
 
@@ -182,10 +183,11 @@
       file.$fileResource = options.$fileResource;
       file.$presignResource = options.$presignResource;
 
-      file.saveParams = angular.copy(options.saveParams);
-      file.saveParams.fileName = file.data.name;
-      file.saveParams.fileType = file.data.type;
-      file.saveParams.fileSize = file.data.size;
+      file.saveParams = {};
+      file.saveParams.param = angular.copy(options.saveParams);
+      file.saveParams.param.fileName = file.data.name;
+      file.saveParams.param.fileType = file.data.type;
+      file.saveParams.param.fileSize = file.data.size;
 
       if (file.newFile) {
         file._upload();
@@ -203,11 +205,15 @@
 
     File.prototype.retry = function() {
       this._upload();
-    }
+    };
 
     File.prototype.cancel = function() {
-      this._xhr.abort();
-    }
+      if (this._xhr) {
+        this._xhr.abort();
+      } else {
+        this.onRemove(this);
+      }
+    };
 
     File.prototype.remove = function() {
       var deferred = $q.defer();
@@ -225,12 +231,12 @@
       });
 
       return deferred.promise;
-    }
+    };
 
-    File.prototype.onRemove = function() { /* noop */ }
-    File.prototype.onProgress = function() { /* noop */ }
-    File.prototype.onSuccess = function() { /* noop */ }
-    File.prototype.onFailure = function() { /* noop */ }
+    File.prototype.onRemove = function() { /* noop */ };
+    File.prototype.onProgress = function() { /* noop */ };
+    File.prototype.onSuccess = function() { /* noop */ };
+    File.prototype.onFailure = function() { /* noop */ };
 
     //
     // Private methods
@@ -263,8 +269,7 @@
       });
 
       $promise.catch(function(data) {
-        file.status = 'failed';
-        file.onFailure(response);
+        file._failed('Could not get presigned URL from server');
       });
       
     };
@@ -287,7 +292,7 @@
 
     File.prototype._onProgress = function(e) {
       this.progress = Math.round(e.lengthComputable ? e.loaded * 100 / e.total : 0);
-    }
+    };
 
     File.prototype._onLoad = function() {
       var file = this;
@@ -304,25 +309,29 @@
         });
 
         $promise.catch(function() {
-          file.status = 'failed';
-          file.onFailure(response);
+          file._failed('Could not create file record in database');
         });
 
       } else {
-        file.status = 'failed';
-        file.onFailure(response);
+        file._failed('Could not upload file to S3');
       }
 
-    }
+    };
 
     File.prototype._onError = function() {
       var response = this._transformResponse(this._xhr);
-      this.onFailure(response);
-    }
+      this._failed('Could not connect to S3');
+    };
 
     File.prototype._onAbort = function() {
       this.onRemove(this);
-    }
+    };
+
+    File.prototype._failed = function(msg) {
+      console.log(msg);
+      file.status = 'failed';
+      file.onFailure(msg);
+    };
 
     //
     // Helper methods

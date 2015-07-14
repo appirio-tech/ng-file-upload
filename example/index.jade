@@ -68,8 +68,13 @@ html(ng-app="example-app", ng-controller="ExampleAppController as vm")
     | {{ vm.uploaderStatus }}
     
     ap-uploader(
-      config="vm.uploaderConfig",
-      status="vm.uploaderStatus"
+      config="vm.uploaderSingleConfig",
+      status="vm.uploaderSingleStatus"
+    )
+    
+    ap-uploader(
+      config="vm.uploaderMultipleConfig",
+      status="vm.uploaderMultipleStatus"
     )
     
     each path in bowers
