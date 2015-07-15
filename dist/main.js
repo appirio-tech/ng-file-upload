@@ -11,11 +11,23 @@
 
   angular
     .module('ap-file-upload')
-    .factory('Uploader', Uploader);
+    .factory('UploaderService', UploaderService);
 
-  Uploader.$inject = ['$q', 'File', '$resource'];
+  UploaderService.$inject = ['$q', 'File', '$resource'];
   /* @ngInject */
-  function Uploader($q, File, $resource) {
+  function UploaderService($q, File, $resource) {
+
+    var uploaderRegistry = {};
+
+    function getUploader(options) {
+      if (uploaderRegistry[options.name]) {
+        return uploaderRegistry[options.name];
+      } else {
+        var uploader = new Uploader(options);
+        uploaderRegistry[options.name] = uploader;
+        return uploader;
+      }
+    }
 
     function Uploader(options) {
       options = options || {};
@@ -46,16 +58,18 @@
       return $q.all(files.map(function(file){
         return uploader._add(file, options);
       }));
-    }
+    };
 
-    Uploader.prototype.onUpdate = function() {}
+    Uploader.prototype.onUpdate = function() {};
 
     Uploader.prototype._add = function(file, options) {
       options = options || {};
       var deferred = $q.defer();
       var uploader = this;
-      var replace = options.replace || false;
-      var dupePosition = uploader._indexOfFilename(file.name); 
+
+      // TODO: Prompt user to confirm replacing file
+      var replace = true;
+      var dupePosition = uploader._indexOfFilename(file.name);
       var dupe = dupePosition >= 0;
 
       if (dupe) {
@@ -83,7 +97,7 @@
       deferred.resolve();
 
       return deferred.promise;
-    }
+    };
 
     Uploader.prototype._populate = function(queryUrl) {
       var uploader = this;
@@ -98,10 +112,10 @@
           }, {
             newFile: false,
             fileId: file.fileId
-          })
+          });
         });
-      })
-    }
+      });
+    };
 
     Uploader.prototype._newFile = function(file, options) {
       var uploader = this;
@@ -129,7 +143,7 @@
       };
 
       return file;
-    }
+    };
 
     Uploader.prototype._remove = function(file) {
       var deferred = $q.defer();
@@ -137,27 +151,29 @@
 
       deferred.resolve();
       return deferred.promise;
-    }
+    };
 
     Uploader.prototype._indexOfFilename = function(name) {
       var uploader = this;
 
       for (var i = 0; i < uploader.files.length; i++) {
         if (uploader.files[i].name === name) return i;
-      };
+      }
 
       return -1;
-    }
+    };
 
     function filelistToArray(collection) {
       var array = [];
       for (var i = 0; i < collection.length; i++) {
         array[i] = collection[i];
-      };
+      }
       return array;
     }
 
-    return Uploader;
+    return {
+      get: getUploader
+    };
 
   }
 })();
@@ -250,8 +266,12 @@
 
       var $promise = file._getPresignedUrl();
 
-      $promise.then(function(data) {
-        file.preSignedUrlUpload = data.result.content.preSignedUrlUpload;
+      $promise.then(function(response) {
+        if (!response.result.content) {
+          return file._failed('Could not get presigned URL from server');
+        }
+        
+        file.preSignedUrlUpload = response.result.content.preSignedUrlUpload;
 
         var xhr = file._xhr = new XMLHttpRequest();
         var formData = new FormData();
@@ -434,13 +454,14 @@
     .module('ap-file-upload')
     .controller('UploaderController', UploaderController);
 
-  UploaderController.$inject = ['$scope', 'Uploader'];
+  UploaderController.$inject = ['$scope', 'UploaderService'];
 
-  function UploaderController($scope, Uploader) {
+  function UploaderController($scope, UploaderService) {
     var vm = this;
     vm.multiple = $scope.config.multiple;
 
-    vm.uploader = new Uploader({
+    vm.uploader = UploaderService.get({
+      name: $scope.config.name,
       allowMultiple: $scope.config.allowMultiple,
       fileEndpoint: $scope.config.fileEndpoint,
       queryUrl: $scope.config.queryUrl,
@@ -477,9 +498,9 @@
     .module('ap-file-upload')
     .controller('FileController', FileController);
 
-  FileController.$inject = ['$scope', 'Uploader'];
+  FileController.$inject = ['$scope'];
 
-  function FileController($scope, Uploader) {
+  function FileController($scope) {
     var vm = this;
     vm.file = $scope.file;
   }

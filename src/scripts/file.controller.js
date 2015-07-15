@@ -5,9 +5,9 @@
     .module('ap-file-upload')
     .controller('FileController', FileController);
 
-  FileController.$inject = ['$scope', 'Uploader'];
+  FileController.$inject = ['$scope'];
 
-  function FileController($scope, Uploader) {
+  function FileController($scope) {
     var vm = this;
     vm.file = $scope.file;
   }

@@ -5,13 +5,14 @@
     .module('ap-file-upload')
     .controller('UploaderController', UploaderController);
 
-  UploaderController.$inject = ['$scope', 'Uploader'];
+  UploaderController.$inject = ['$scope', 'UploaderService'];
 
-  function UploaderController($scope, Uploader) {
+  function UploaderController($scope, UploaderService) {
     var vm = this;
     vm.multiple = $scope.config.multiple;
 
-    vm.uploader = new Uploader({
+    vm.uploader = UploaderService.get({
+      name: $scope.config.name,
       allowMultiple: $scope.config.allowMultiple,
       fileEndpoint: $scope.config.fileEndpoint,
       queryUrl: $scope.config.queryUrl,

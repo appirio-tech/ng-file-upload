@@ -3,11 +3,23 @@
 
   angular
     .module('ap-file-upload')
-    .factory('Uploader', Uploader);
+    .factory('UploaderService', UploaderService);
 
-  Uploader.$inject = ['$q', 'File', '$resource'];
+  UploaderService.$inject = ['$q', 'File', '$resource'];
   /* @ngInject */
-  function Uploader($q, File, $resource) {
+  function UploaderService($q, File, $resource) {
+
+    var uploaderRegistry = {};
+
+    function getUploader(options) {
+      if (uploaderRegistry[options.name]) {
+        return uploaderRegistry[options.name];
+      } else {
+        var uploader = new Uploader(options);
+        uploaderRegistry[options.name] = uploader;
+        return uploader;
+      }
+    }
 
     function Uploader(options) {
       options = options || {};
@@ -151,7 +163,9 @@
       return array;
     }
 
-    return Uploader;
+    return {
+      get: getUploader
+    };
 
   }
 })();

@@ -23,6 +23,7 @@ status (required) - [string]: Gives the parent scope access to the status of the
 
 config (required) - [object]: Contains all the config information need to run and integrate the directive:
 
+- name (required) - [string]: A name for this uploader. Used internally for retrieval from the service. **Must be unique for your app.**
 - fileEndpoint (required) - [string]: This should be the endpoint to create/delete records after successful upload to S3. ``:name`` will be replaced with the actual filename at query time.
 - urlPresigner (required) - [string]: This is the URL to create/delete records after successful upload to S3. ``:name`` will be replaced with the actual filename at query time.
 - multiple - [true|**false**]: Should this instance of the uploader allow multiple files. If not, adding a file will prompt the user to replace. If the user confirms, the previous file will be deleted before the new one is uploaded.
@@ -40,7 +41,7 @@ config (required) - [object]: Contains all the config information need to run an
 
 ### Using the example app
 
-``gulp serve`` will start a local Browsersync server on ``localhost:9001``
+``gulp serve`` will start a local Browsersync server.
 
 ### Comitting changes
 

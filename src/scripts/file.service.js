@@ -86,8 +86,12 @@
 
       var $promise = file._getPresignedUrl();
 
-      $promise.then(function(data) {
-        file.preSignedUrlUpload = data.result.content.preSignedUrlUpload;
+      $promise.then(function(response) {
+        if (!response.result.content) {
+          return file._failed('Could not get presigned URL from server');
+        }
+        
+        file.preSignedUrlUpload = response.result.content.preSignedUrlUpload;
 
         var xhr = file._xhr = new XMLHttpRequest();
         var formData = new FormData();
