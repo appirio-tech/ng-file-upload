@@ -38,16 +38,18 @@
       return $q.all(files.map(function(file){
         return uploader._add(file, options);
       }));
-    }
+    };
 
-    Uploader.prototype.onUpdate = function() {}
+    Uploader.prototype.onUpdate = function() {};
 
     Uploader.prototype._add = function(file, options) {
       options = options || {};
       var deferred = $q.defer();
       var uploader = this;
-      var replace = options.replace || false;
-      var dupePosition = uploader._indexOfFilename(file.name); 
+
+      // TODO: Prompt user to confirm replacing file
+      var replace = true;
+      var dupePosition = uploader._indexOfFilename(file.name);
       var dupe = dupePosition >= 0;
 
       if (dupe) {
@@ -75,7 +77,7 @@
       deferred.resolve();
 
       return deferred.promise;
-    }
+    };
 
     Uploader.prototype._populate = function(queryUrl) {
       var uploader = this;
@@ -90,10 +92,10 @@
           }, {
             newFile: false,
             fileId: file.fileId
-          })
+          });
         });
-      })
-    }
+      });
+    };
 
     Uploader.prototype._newFile = function(file, options) {
       var uploader = this;
@@ -121,7 +123,7 @@
       };
 
       return file;
-    }
+    };
 
     Uploader.prototype._remove = function(file) {
       var deferred = $q.defer();
@@ -129,23 +131,23 @@
 
       deferred.resolve();
       return deferred.promise;
-    }
+    };
 
     Uploader.prototype._indexOfFilename = function(name) {
       var uploader = this;
 
       for (var i = 0; i < uploader.files.length; i++) {
         if (uploader.files[i].name === name) return i;
-      };
+      }
 
       return -1;
-    }
+    };
 
     function filelistToArray(collection) {
       var array = [];
       for (var i = 0; i < collection.length; i++) {
         array[i] = collection[i];
-      };
+      }
       return array;
     }
 
