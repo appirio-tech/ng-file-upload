@@ -125,9 +125,7 @@
     };
 
     File.prototype._getPresignedUrl = function() {
-      return this.$presignResource.get({
-        name: this.name
-      }).$promise;
+      return this.$presignResource.save(this.saveParams).$promise;
     };
 
     File.prototype._onProgress = function(e) {
