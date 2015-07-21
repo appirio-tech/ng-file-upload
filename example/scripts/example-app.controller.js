@@ -31,9 +31,9 @@
     vm.uploaderSingleConfig = {
       name: 'singleUploader',
       allowMultiple: false,
-      queryUrl: domain + '/v3/workrequestfiles?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
-      urlPresigner: domain + '/v3/workrequestfiles/uploadurl',
-      fileEndpoint: domain + '/v3/workrequestfiles/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
+      queryUrl: domain + '/v3/work-files/assets?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
+      urlPresigner: domain + '/v3/work-files/uploadurl',
+      fileEndpoint: domain + '/v3/work-files/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
       saveParams: {
         workId: workId,
         assetType: "brief"
@@ -45,9 +45,9 @@
     vm.uploaderMultipleConfig = {
       name: 'multipleUploader',
       allowMultiple: true,
-      queryUrl: domain + '/v3/workrequestfiles?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
-      urlPresigner: domain + '/v3/workrequestfiles/uploadurl?filter=workId%3D' + workId + '%26assetType%3D' + assetType + '%26fileName%3D:name',
-      fileEndpoint: domain + '/v3/workrequestfiles/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
+      queryUrl: domain + '/v3/work-files/assets?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
+      urlPresigner: domain + '/v3/work-files/uploadurl',
+      fileEndpoint: domain + '/v3/work-files/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
       saveParams: {
         workId: workId,
         assetType: "specs"

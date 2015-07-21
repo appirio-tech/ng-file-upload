@@ -28,7 +28,6 @@
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
-      console.log(options.urlPresigner);
       this.$presignResource = $resource(options.urlPresigner);
       this.saveParams = options.saveParams || {};
 
