@@ -23,7 +23,7 @@
 
 
     var domain = 'http://api.topcoder-dev.com';
-    var workRequestId = '1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe';
+    var workId = '1437501400964-834acc5a-f1ff-472c-beb7-76cd5ea5a1c6';
 
     var assetType = 'brief';
     
@@ -31,11 +31,11 @@
     vm.uploaderSingleConfig = {
       name: 'singleUploader',
       allowMultiple: false,
-      queryUrl: domain + '/v3/workrequestfiles?filter=workRequestId%3D' + workRequestId + '%26assetType%3D' + assetType,
+      queryUrl: domain + '/v3/workrequestfiles?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
       urlPresigner: domain + '/v3/workrequestfiles/uploadurl',
-      fileEndpoint: domain + '/v3/workrequestfiles/:fileId?filter=workRequestId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
+      fileEndpoint: domain + '/v3/workrequestfiles/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
       saveParams: {
-        workId: workRequestId,
+        workId: workId,
         assetType: "brief"
       }
     };
@@ -45,11 +45,11 @@
     vm.uploaderMultipleConfig = {
       name: 'multipleUploader',
       allowMultiple: true,
-      queryUrl: domain + '/v3/workrequestfiles?filter=workRequestId%3D' + workRequestId + '%26assetType%3D' + assetType,
-      urlPresigner: domain + '/v3/workrequestfiles/uploadurl?filter=workRequestId%3D' + workRequestId + '%26assetType%3D' + assetType + '%26fileName%3D:name',
-      fileEndpoint: domain + '/v3/workrequestfiles/:fileId?filter=workRequestId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
+      queryUrl: domain + '/v3/workrequestfiles?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
+      urlPresigner: domain + '/v3/workrequestfiles/uploadurl?filter=workId%3D' + workId + '%26assetType%3D' + assetType + '%26fileName%3D:name',
+      fileEndpoint: domain + '/v3/workrequestfiles/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
       saveParams: {
-        workId: workRequestId,
+        workId: workId,
         assetType: "specs"
       }
     };
