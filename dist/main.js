@@ -36,7 +36,6 @@
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
-      console.log(options.urlPresigner);
       this.$presignResource = $resource(options.urlPresigner);
       this.saveParams = options.saveParams || {};
 
@@ -305,9 +304,7 @@
     };
 
     File.prototype._getPresignedUrl = function() {
-      return this.$presignResource.get({
-        name: this.name
-      }).$promise;
+      return this.$presignResource.save(this.saveParams).$promise;
     };
 
     File.prototype._onProgress = function(e) {
