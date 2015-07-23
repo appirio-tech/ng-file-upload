@@ -9,7 +9,7 @@
 
   function UploaderController($scope, UploaderService) {
     var vm = this;
-    vm.multiple = $scope.config.multiple;
+    vm.allowMultiple = $scope.config.allowMultiple;
 
     vm.uploader = UploaderService.get({
       name: $scope.config.name,
