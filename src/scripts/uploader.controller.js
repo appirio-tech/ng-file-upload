@@ -12,7 +12,6 @@
     vm.allowMultiple = $scope.config.allowMultiple;
 
     vm.uploader = UploaderService.get({
-      status: $scope.status,
       name: $scope.config.name,
       allowMultiple: $scope.config.allowMultiple,
       fileEndpoint: $scope.config.fileEndpoint,
@@ -21,8 +20,11 @@
       saveParams: $scope.config.saveParams,
     });
 
-    // vm.status = $scope.status;
-
+    $scope.$watch('vm.uploader.status', function(status) {
+      if (status) {
+        $scope.status = status;
+      }
+    })
   }
   
 })();

@@ -25,7 +25,7 @@
       options = options || {};
 
       this.files = [];
-      this.status = options.status;
+      this.status = '';
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
@@ -54,14 +54,15 @@
 
     Uploader.prototype.onUpdate = function() {
       var uploader = this;
-      //if any file is in progress, etc.
-      for (var i =0; i < uploader.files.length; i++) {
-        if (files[i].status === 'started') {
-          uploader.status = 'started'
-        } else if (files[i].status === 'failed') {
-        uploader.status = 'failed';
+      for (var i = 0; i < uploader.files.length; i++) {
+        if (uploader.files[i].status == 'started') {
+          uploader.status = 'started';
+          return;
+        } else if (uploader.files[i].status == 'failed') {
+          uploader.status = 'failed';
+          return;
+        }
       }
-    }
       uploader.status = 'succeeded';
     };
 
