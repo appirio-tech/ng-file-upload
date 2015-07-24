@@ -166,6 +166,7 @@
     };
 
     File.prototype._failed = function(msg) {
+      var file = this;
       console.log(msg);
       file.status = 'failed';
       file.onFailure(msg);
