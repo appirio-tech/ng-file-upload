@@ -20,6 +20,11 @@
       saveParams: $scope.config.saveParams,
     });
 
+    $scope.$watch('vm.uploader.status', function(status) {
+      if (status) {
+        $scope.status = status;
+      }
+    })
   }
   
 })();

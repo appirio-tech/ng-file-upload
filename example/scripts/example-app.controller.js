@@ -21,7 +21,6 @@
       });
     };
 
-
     var domain = 'http://api.topcoder-dev.com';
     var workId = '1437501400964-834acc5a-f1ff-472c-beb7-76cd5ea5a1c6';
 
@@ -33,7 +32,7 @@
       allowMultiple: false,
       queryUrl: domain + '/v3/work-files/assets?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
       urlPresigner: domain + '/v3/work-files/uploadurl',
-      fileEndpoint: domain + '/v3/work-files/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
+      fileEndpoint: domain + '/v3/work-files/:fileId',
       saveParams: {
         workId: workId,
         assetType: "brief"

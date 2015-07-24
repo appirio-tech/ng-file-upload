@@ -33,6 +33,7 @@
       options = options || {};
 
       this.files = [];
+      this.status = '';
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
@@ -59,7 +60,19 @@
       }));
     };
 
-    Uploader.prototype.onUpdate = function() {};
+    Uploader.prototype.onUpdate = function() {
+      var uploader = this;
+      for (var i = 0; i < uploader.files.length; i++) {
+        if (uploader.files[i].status == 'started') {
+          uploader.status = 'started';
+          return;
+        } else if (uploader.files[i].status == 'failed') {
+          uploader.status = 'failed';
+          return;
+        }
+      }
+      uploader.status = 'succeeded';
+    };
 
     Uploader.prototype._add = function(file, options) {
       options = options || {};
@@ -345,6 +358,7 @@
     };
 
     File.prototype._failed = function(msg) {
+      var file = this;
       console.log(msg);
       file.status = 'failed';
       file.onFailure(msg);
@@ -466,6 +480,11 @@
       saveParams: $scope.config.saveParams,
     });
 
+    $scope.$watch('vm.uploader.status', function(status) {
+      if (status) {
+        $scope.status = status;
+      }
+    })
   }
   
 })();
@@ -504,5 +523,5 @@
   
 })();
 
-angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"vm.file.status\"><span>{{vm.file.name}}</span><button ng-show=\"vm.file.status == \'started\'\" ng-click=\"vm.file.cancel()\">Cancel</button><button ng-show=\"vm.file.status == \'succeeded\' || vm.file.status == \'failed\'\" ng-click=\"vm.file.remove()\">Remove</button><button ng-show=\"vm.file.status == \'failed\'\" ng-click=\"vm.file.retry()\">Retry</button><progress ng-show=\"vm.file.status == \'started\'\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress></div>");
+angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"vm.file.status\"><span>{{vm.file.name}}</span><button ng-show=\"vm.file.status == \'started\'\" ng-click=\"vm.file.cancel()\">Cancel</button><button ng-show=\"vm.file.status == \'succeeded\' || vm.file.status == \'failed\'\" ng-click=\"vm.file.remove()\">Remove</button><button ng-show=\"vm.file.status == \'failed\'\" ng-click=\"vm.file.retry()\">Retry</button><p ng-show=\"vm.file.status == \'failed\'\">Upload Failed</p><progress ng-show=\"vm.file.status == \'started\'\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress></div>");
 $templateCache.put("uploader.html","<div class=\"wrapper\"><input ng-if=\"vm.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
