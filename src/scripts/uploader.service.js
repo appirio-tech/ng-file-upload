@@ -56,10 +56,10 @@
     Uploader.prototype.onUpdate = function() {
       var uploader = this;
       for (var i = 0; i < uploader.files.length; i++) {
-        if (uploader.files[i].uploading) {
+        if (uploader.files[i].uploading === true) {
           uploader.uploading = true;
           return;
-        } else if (uploader.files[i].hasErrors) {
+        } else if (uploader.files[i].hasErrors === true) {
           uploader.hasErrors = true;
           return;
         }
