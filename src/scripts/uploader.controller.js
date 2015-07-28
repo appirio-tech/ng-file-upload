@@ -20,11 +20,13 @@
       saveParams: $scope.config.saveParams,
     });
 
-    $scope.$watch('vm.uploader.status', function(status) {
-      if (status) {
-        $scope.status = status;
-      }
+    $scope.$watch('vm.uploader.uploading', function(newValue) {
+        $scope.uploading = newValue;
+     })
+
+    $scope.$watch('vm.uploader.hasErrors', function(newValue) {
+        $scope.hasErrors = newValue;
     })
   }
-  
+
 })();

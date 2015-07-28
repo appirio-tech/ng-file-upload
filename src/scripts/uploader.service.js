@@ -25,7 +25,8 @@
       options = options || {};
 
       this.files = [];
-      this.status = '';
+      this.uploading = null;
+      this.hasError = null;
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
@@ -55,15 +56,16 @@
     Uploader.prototype.onUpdate = function() {
       var uploader = this;
       for (var i = 0; i < uploader.files.length; i++) {
-        if (uploader.files[i].status == 'started') {
-          uploader.status = 'started';
+        if (uploader.files[i].uploading) {
+          uploader.uploading = true;
           return;
-        } else if (uploader.files[i].status == 'failed') {
-          uploader.status = 'failed';
+        } else if (uploader.files[i].hasErrors) {
+          uploader.hasErrors = true;
           return;
         }
       }
-      uploader.status = 'succeeded';
+      uploader.uploading = false;
+      uploader.hasErrors = false;
     };
 
     Uploader.prototype._add = function(file, options) {

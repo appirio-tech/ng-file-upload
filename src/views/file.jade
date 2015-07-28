@@ -1,7 +1,7 @@
-div(ng-class="vm.file.status")
+div(ng-class="{'failed': vm.file.hasErrors}")
   span {{vm.file.name}}
-  button(ng-show="vm.file.status == 'started'", ng-click="vm.file.cancel()") Cancel
-  button(ng-show="vm.file.status == 'succeeded' || vm.file.status == 'failed'", ng-click="vm.file.remove()") Remove
-  button(ng-show="vm.file.status == 'failed'", ng-click="vm.file.retry()") Retry
-  p(ng-show="vm.file.status == 'failed'") Upload Failed
-  progress(ng-show="vm.file.status == 'started'", value="{{vm.file.progress}}", max="100") {{vm.file.progress}}%
+  button(ng-show="vm.file.uploading", ng-click="vm.file.cancel()") Cancel
+  button(ng-show="!vm.file.uploading", ng-click="vm.file.remove()") Remove
+  button(ng-show="vm.file.hasErrors", ng-click="vm.file.retry()") Retry
+  p(ng-show="vm.file.hasErrors") Upload Failed
+  progress(ng-show="vm.file.uploading", value="{{vm.file.progress}}", max="100") {{vm.file.progress}}%

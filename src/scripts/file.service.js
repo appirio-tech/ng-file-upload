@@ -29,7 +29,8 @@
         file._upload();
       } else {
         file.fileId = options.fileId;
-        file.status = 'succeeded';
+        file.uploading = false;
+        file.hasErrors = false;
       }
 
       return file;
@@ -81,7 +82,8 @@
     File.prototype._upload = function() {
       var file = this;
 
-      file.status = 'started';
+      file.uploading = true;
+      file.hasErrors = false;
       file.progress = 0;
 
       var $promise = file._getPresignedUrl();
@@ -142,7 +144,8 @@
 
         $promise.then(function(data) {
           file.fileId = data.result.content.fileId;
-          file.status = 'succeeded';
+          file.hasErrors = false;
+          file.uploading = false;
           file.onSuccess(response);
         });
 
@@ -168,7 +171,8 @@
     File.prototype._failed = function(msg) {
       var file = this;
       console.log(msg);
-      file.status = 'failed';
+      file.hasErrors = true;
+      file.uploading = false;
       file.onFailure(msg);
     };
 
