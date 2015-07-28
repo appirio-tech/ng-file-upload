@@ -63,7 +63,6 @@
 
     Uploader.prototype.onUpdate = function() {
       var uploader = this;
-      console.log('UPDATE')
       for (var i = 0; i < uploader.files.length; i++) {
         if (uploader.files[i].uploading) {
           uploader.uploading = true;
@@ -489,20 +488,14 @@
     });
 
     $scope.$watch('vm.uploader.uploading', function(newValue) {
-      if (newValue) {
-        console.log('new uploading', newValue)
         $scope.uploading = newValue;
-      }
-    })
+     })
 
     $scope.$watch('vm.uploader.hasErrors', function(newValue) {
-      if (newValue) {
-        console.log('new hasError', newValue)
         $scope.hasErrors = newValue;
-      }
     })
   }
-  
+
 })();
 
 (function () {
