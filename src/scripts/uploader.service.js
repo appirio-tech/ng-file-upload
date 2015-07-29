@@ -26,7 +26,7 @@
 
       this.files = [];
       this.uploading = null;
-      this.hasError = null;
+      this.hasErrors = null;
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
