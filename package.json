@@ -4,7 +4,7 @@
     "node": ">=0.10.0"
   },
   "devDependencies": {
-    "appirio-gulp-tasks": "0.0.24",
+    "appirio-gulp-tasks": "2.x.x",
     "appirio-work-styles": "0.x.x",
     "gulp": "^3.8.11"
   }
