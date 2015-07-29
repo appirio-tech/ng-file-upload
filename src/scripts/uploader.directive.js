@@ -8,7 +8,8 @@
   function apUploader() {
     return {
       scope: {
-        status: '=',
+        uploading: '=',
+        hasErrors: '=',
         config: '='
       },
       controller: 'UploaderController as vm',

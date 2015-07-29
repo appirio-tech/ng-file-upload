@@ -64,17 +64,17 @@ html(ng-app="example-app", ng-controller="ExampleAppController as vm")
       input(type="text", name="username", placeholder="username", ng-model="vm.username")
       input(type="password", name="password", placeholder="password", ng-model="vm.password")
       button(type="submit") Login
-
-    | {{ vm.uploaderStatus }}
     
     ap-uploader(
       config="vm.uploaderSingleConfig",
-      status="vm.uploaderSingleStatus"
+      uploading="vm.uploaderSingleUploading",
+      hasErrors="vm.uploaderSingleHasErrors"
     )
     
     ap-uploader(
       config="vm.uploaderMultipleConfig",
-      status="vm.uploaderMultipleStatus"
+      uploading="vm.uploaderMultipleUploading",
+      hasErrors="vm.uploaderMultipleHasErrors"
     )
     
     each path in bowers

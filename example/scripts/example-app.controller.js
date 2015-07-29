@@ -25,8 +25,8 @@
     var workId = '1437501400964-834acc5a-f1ff-472c-beb7-76cd5ea5a1c6';
 
     var assetType = 'brief';
-    
-    vm.uploaderSingleStatus = '';
+    vm.uploaderSingleUploading = null;
+    vm.uploaderSingleHasErrors = null;
     vm.uploaderSingleConfig = {
       name: 'singleUploader',
       allowMultiple: false,
@@ -40,7 +40,8 @@
     };
     
     assetType = 'specs';
-    vm.uploaderMultipleStatus = '';
+    vm.uploaderMultipleUploading = null;
+    vm.uploaderMultipleHasErrors = null;
     vm.uploaderMultipleConfig = {
       name: 'multipleUploader',
       allowMultiple: true,
