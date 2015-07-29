@@ -7,7 +7,6 @@ install:
 - npm install
 - bower install
 script:
-- gulp test
 sudo: false
 after_success:
 - gulp coveralls
