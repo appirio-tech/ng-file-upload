@@ -8,7 +8,6 @@ install:
 - bower install
 script:
 - gulp test
-- gulp build
 sudo: false
 after_success:
 - gulp coveralls
