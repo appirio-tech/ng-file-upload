@@ -55,17 +55,19 @@
 
     Uploader.prototype.onUpdate = function() {
       var uploader = this;
+      var uploading = false;
+      var hasErrors = false;
+
       for (var i = 0; i < uploader.files.length; i++) {
         if (uploader.files[i].uploading === true) {
-          uploader.uploading = true;
-          return;
+          uploading = true;
         } else if (uploader.files[i].hasErrors === true) {
-          uploader.hasErrors = true;
-          return;
+          hasErrors = true;
         }
       }
-      uploader.uploading = false;
-      uploader.hasErrors = false;
+
+      uploader.uploading = uploading;
+      uploader.hasErrors = hasErrors;
     };
 
     Uploader.prototype._add = function(file, options) {
