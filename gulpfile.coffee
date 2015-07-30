@@ -9,6 +9,9 @@ configs.templateCache.push
   root  : ''
   module: 'ap-file-upload'
 
+configs.useref =
+  searchPath: ['.tmp', 'src', '.']
+
 ### END CONFIG ###
 loadTasksModule = require __dirname + '/node_modules/appirio-gulp-tasks/load-tasks.coffee'
 

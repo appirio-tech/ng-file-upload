@@ -66,13 +66,13 @@
       var uploading = false;
       var hasErrors = false;
 
-      for (var i = 0; i < uploader.files.length; i++) {
-        if (uploader.files[i].uploading === true) {
+      uploader.files.forEach(function(file) {
+        if (file.uploading === true) {
           uploading = true;
-        } else if (uploader.files[i].hasErrors === true) {
+        } else if (file.hasErrors === true) {
           hasErrors = true;
         }
-      }
+      });
 
       uploader.uploading = uploading;
       uploader.hasErrors = hasErrors;
@@ -88,26 +88,32 @@
       var dupePosition = uploader._indexOfFilename(file.name);
       var dupe = dupePosition >= 0;
 
+      var file = uploader._newFile(file, options);
+
       if (dupe) {
         if (replace) {
           uploader.files[dupePosition].remove().then(function() {
-            uploader.files[dupePosition] = uploader._newFile(file, options);
+            uploader.files[dupePosition] = file;
           });
         } else {
           deferred.reject('DUPE');
         }
       } else {
         if (uploader.allowMultiple) {
-          uploader.files.push(uploader._newFile(file, options));
+          uploader.files.push(file);
         } else {
           if (uploader.files[0]) {
             uploader.files[0].remove().then(function() {
-              uploader.files[0] = uploader._newFile(file, options);
+              uploader.files[0] = file;
             });
           } else {
-            uploader.files[0] = uploader._newFile(file, options);
+            uploader.files[0] = file;
           }
         }
+      }
+
+      if (file.newFile) {
+        file.start();
       }
 
       deferred.resolve();
@@ -141,6 +147,10 @@
       options.saveParams = uploader.saveParams;
 
       file = new File(file, options);
+
+      file.onStart = function(response) {
+        uploader.onUpdate();
+      };
 
       file.onProgress = function(response) {
         uploader.onUpdate();
@@ -221,9 +231,7 @@
       file.saveParams.param.fileType = file.data.type;
       file.saveParams.param.fileSize = file.data.size;
 
-      if (file.newFile) {
-        file._upload();
-      } else {
+      if (!file.newFile) {
         file.fileId = options.fileId;
         file.uploading = false;
         file.hasErrors = false;
@@ -235,6 +243,10 @@
     //
     // Public methods
     //
+
+    File.prototype.start = function() {
+      this._upload();
+    };
 
     File.prototype.retry = function() {
       this._upload();
@@ -266,6 +278,7 @@
       return deferred.promise;
     };
 
+    File.prototype.onStart = function() { /* noop */ };
     File.prototype.onRemove = function() { /* noop */ };
     File.prototype.onProgress = function() { /* noop */ };
     File.prototype.onSuccess = function() { /* noop */ };
@@ -281,6 +294,8 @@
       file.uploading = true;
       file.hasErrors = false;
       file.progress = 0;
+
+      file.onStart();
 
       var $promise = file._getPresignedUrl();
 
