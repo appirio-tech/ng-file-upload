@@ -1,0 +1,41 @@
+- var bowers = []
+- bowers.push('angular/angular')
+- bowers.push('angular-resource/angular-resource')
+- bowers.push('angular-ui-router/release/angular-ui-router')
+- bowers.push('appirio-tech-ng-auth/dist/main')
+- bowers.push('auth0.js/build/auth0')
+- bowers.push('auth0-angular/build/auth0-angular')
+- bowers.push('a0-angular-storage/dist/angular-storage')
+- bowers.push('angular-jwt/dist/angular-jwt')
+
+- var scripts = []
+- scripts.push('ap-file-upload.module')
+- scripts.push('uploader.service')
+- scripts.push('file.service')
+- scripts.push('on-file-change.directive')
+- scripts.push('uploader.directive')
+- scripts.push('uploader.controller')
+- scripts.push('file.directive')
+- scripts.push('file.controller')
+- scripts.push('templates')
+
+
+- var examples = []
+- examples.push('constants')
+- examples.push('example-app.module')
+- examples.push('example-app.controller')
+
+each path in bowers
+  script(src="bower_components/#{path}.js", type="text/javascript")
+
+// build:js main.js
+= "\n"
+each path in scripts
+  script(src="scripts/#{path}.js", type="text/javascript")
+  = "\n"
+= "\n"
+// endbuild
+= "\n"
+
+each path in examples
+  script(src="scripts/#{path}.js", type="text/javascript")
