@@ -25,9 +25,7 @@
       file.saveParams.param.fileType = file.data.type;
       file.saveParams.param.fileSize = file.data.size;
 
-      if (file.newFile) {
-        file._upload();
-      } else {
+      if (!file.newFile) {
         file.fileId = options.fileId;
         file.uploading = false;
         file.hasErrors = false;
@@ -39,6 +37,10 @@
     //
     // Public methods
     //
+
+    File.prototype.start = function() {
+      this._upload();
+    };
 
     File.prototype.retry = function() {
       this._upload();
@@ -70,6 +72,7 @@
       return deferred.promise;
     };
 
+    File.prototype.onStart = function() { /* noop */ };
     File.prototype.onRemove = function() { /* noop */ };
     File.prototype.onProgress = function() { /* noop */ };
     File.prototype.onSuccess = function() { /* noop */ };
@@ -85,6 +88,8 @@
       file.uploading = true;
       file.hasErrors = false;
       file.progress = 0;
+
+      file.onStart();
 
       var $promise = file._getPresignedUrl();
 
