@@ -25,14 +25,8 @@
 - examples.push('example-app.module')
 - examples.push('example-app.controller')
 
-= "\n"
-// build:js lib.js
-= "\n"
 each path in bowers
   script(src="bower_components/#{path}.js", type="text/javascript")
-  = "\n"
-// endbuild
-= "\n"
 
 // build:js main.js
 = "\n"
@@ -43,11 +37,5 @@ each path in scripts
 // endbuild
 = "\n"
 
-// build:js example.js
-= "\n"
 each path in examples
   script(src="scripts/#{path}.js", type="text/javascript")
-  = "\n"
-= "\n"
-// endbuild
-= "\n"
