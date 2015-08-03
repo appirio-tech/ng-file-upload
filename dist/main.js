@@ -19,32 +19,35 @@
 
     var uploaderRegistry = {};
 
-    function getUploader(options) {
-      if (uploaderRegistry[options.name]) {
-        return uploaderRegistry[options.name];
+    function getUploader(name) {
+      if (uploaderRegistry[name]) {
+        return uploaderRegistry[name];
       } else {
-        var uploader = new Uploader(options);
-        uploaderRegistry[options.name] = uploader;
+        var uploader = new Uploader();
+        uploaderRegistry[name] = uploader;
         return uploader;
       }
     }
 
-    function Uploader(options) {
-      options = options || {};
-
+    function Uploader() {
       this.files = [];
       this.uploading = null;
       this.hasErrors = null;
+    }
+
+    Uploader.prototype.config = function(options) {
+      options = options || {};
+
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
       this.$presignResource = $resource(options.urlPresigner);
       this.saveParams = options.saveParams || {};
+    };
 
-      if (options.queryUrl) {
-        this._populate(options.queryUrl);
-      }
-    }
+    Uploader.prototype.populate = function(queryUrl) {
+      this._populate(queryUrl);
+    };
 
     Uploader.prototype.add = function(files, options) {
       var uploader = this;
@@ -493,24 +496,37 @@
 
   function UploaderController($scope, UploaderService) {
     var vm = this;
-    vm.allowMultiple = $scope.config.allowMultiple;
+    var config = $scope.config || {};
 
-    vm.uploader = UploaderService.get({
-      name: $scope.config.name,
-      allowMultiple: $scope.config.allowMultiple,
-      fileEndpoint: $scope.config.fileEndpoint,
-      queryUrl: $scope.config.queryUrl,
-      urlPresigner: $scope.config.urlPresigner,
-      saveParams: $scope.config.saveParams,
-    });
+    vm.allowMultiple = config.allowMultiple || false;
+    vm.uploader = UploaderService.get(config.name);
+
+    if (config.queryUrl) {
+      vm.uploader.populate(config.queryUrl);
+    }
+
+    function configUploader() {
+      vm.uploader.config({
+        allowMultiple: config.allowMultiple,
+        fileEndpoint: config.fileEndpoint,
+        urlPresigner: config.urlPresigner,
+        saveParams: config.saveParams
+      });
+    }
+
+    $scope.$watch('config', function(newValue) {
+      config = newValue || {};
+      configUploader();
+    }, true);
 
     $scope.$watch('vm.uploader.uploading', function(newValue) {
-        $scope.uploading = newValue;
-     })
+      $scope.uploading = newValue;
+    });
 
     $scope.$watch('vm.uploader.hasErrors', function(newValue) {
-        $scope.hasErrors = newValue;
-    })
+      $scope.hasErrors = newValue;
+    });
+
   }
 
 })();
