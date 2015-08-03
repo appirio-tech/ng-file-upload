@@ -9,6 +9,9 @@ configs.templateCache.push
   root  : ''
   module: 'ap-file-upload'
 
+configs.fixture =
+  files: 'bower_components/appirio-tech-api-schemas/**/*.json'
+
 configs.useref =
   searchPath: ['.tmp', 'src', '.']
 
