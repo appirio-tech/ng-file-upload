@@ -11,32 +11,35 @@
 
     var uploaderRegistry = {};
 
-    function getUploader(options) {
-      if (uploaderRegistry[options.name]) {
-        return uploaderRegistry[options.name];
+    function getUploader(name) {
+      if (uploaderRegistry[name]) {
+        return uploaderRegistry[name];
       } else {
-        var uploader = new Uploader(options);
-        uploaderRegistry[options.name] = uploader;
+        var uploader = new Uploader();
+        uploaderRegistry[name] = uploader;
         return uploader;
       }
     }
 
-    function Uploader(options) {
-      options = options || {};
-
+    function Uploader() {
       this.files = [];
       this.uploading = null;
       this.hasErrors = null;
+    }
+
+    Uploader.prototype.config = function(options) {
+      options = options || {};
+
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
       this.$fileResource = $resource(options.fileEndpoint);
       this.$presignResource = $resource(options.urlPresigner);
       this.saveParams = options.saveParams || {};
+    };
 
-      if (options.queryUrl) {
-        this._populate(options.queryUrl);
-      }
-    }
+    Uploader.prototype.populate = function(queryUrl) {
+      this._populate(queryUrl);
+    };
 
     Uploader.prototype.add = function(files, options) {
       var uploader = this;

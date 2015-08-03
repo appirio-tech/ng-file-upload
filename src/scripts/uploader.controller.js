@@ -9,24 +9,37 @@
 
   function UploaderController($scope, UploaderService) {
     var vm = this;
-    vm.allowMultiple = $scope.config.allowMultiple;
+    var config = $scope.config || {};
 
-    vm.uploader = UploaderService.get({
-      name: $scope.config.name,
-      allowMultiple: $scope.config.allowMultiple,
-      fileEndpoint: $scope.config.fileEndpoint,
-      queryUrl: $scope.config.queryUrl,
-      urlPresigner: $scope.config.urlPresigner,
-      saveParams: $scope.config.saveParams,
-    });
+    vm.allowMultiple = config.allowMultiple || false;
+    vm.uploader = UploaderService.get(config.name);
+
+    if (config.queryUrl) {
+      vm.uploader.populate(config.queryUrl);
+    }
+
+    function configUploader() {
+      vm.uploader.config({
+        allowMultiple: config.allowMultiple,
+        fileEndpoint: config.fileEndpoint,
+        urlPresigner: config.urlPresigner,
+        saveParams: config.saveParams
+      });
+    }
+
+    $scope.$watch('config', function(newValue) {
+      config = newValue || {};
+      configUploader();
+    }, true);
 
     $scope.$watch('vm.uploader.uploading', function(newValue) {
-        $scope.uploading = newValue;
-     })
+      $scope.uploading = newValue;
+    });
 
     $scope.$watch('vm.uploader.hasErrors', function(newValue) {
-        $scope.hasErrors = newValue;
-    })
+      $scope.hasErrors = newValue;
+    });
+
   }
 
 })();
