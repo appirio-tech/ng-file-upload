@@ -3,6 +3,6 @@ div.wrapper
   input(ng-if="vm.allowMultiple", multiple="", type="file" on-file-change="vm.uploader.add(fileList)")
   input(ng-if="!vm.allowMultiple", type="file" on-file-change="vm.uploader.add(fileList)")
 
-  ul
+  ul.uploaderFiles
     li(ng-repeat="file in vm.uploader.files")
       ap-file(file="file")
