@@ -1,4 +1,4 @@
-div.wrapper
+div.uploaderWrapper
 
   input(ng-if="vm.allowMultiple", multiple="", type="file" on-file-change="vm.uploader.add(fileList)")
   input(ng-if="!vm.allowMultiple", type="file" on-file-change="vm.uploader.add(fileList)")
