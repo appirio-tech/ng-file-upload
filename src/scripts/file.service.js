@@ -101,9 +101,6 @@
         file.preSignedUrlUpload = response.result.content.preSignedUrlUpload;
 
         var xhr = file._xhr = new XMLHttpRequest();
-        var formData = new FormData();
-
-        formData.append(file.data.name, file.data);
 
         xhr.upload.onprogress = file._onProgress.bind(file);
         xhr.onload = file._onLoad.bind(file);
@@ -111,8 +108,8 @@
         xhr.onabort = file._onAbort.bind(file);
 
         xhr.open('PUT', file.preSignedUrlUpload, true);
-        xhr.setRequestHeader('Content-Type', 'multipart/form-data');
-        xhr.send(formData);
+        xhr.setRequestHeader('Content-Type', file.data.type);
+        xhr.send(file.data);
       });
 
       $promise.catch(function(data) {

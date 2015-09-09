@@ -12,7 +12,8 @@
     "sinon": "http://sinonjs.org/releases/sinon-1.12.1.js",
     "auto-config-fake-server": "2.x.x",
     "appirio-tech-api-schemas": "3.x.x",
-    "appirio-tech-ng-auth": "1.x.x"
+    "appirio-tech-ng-auth": "3.x.x",
+    "appirio-tech-ng-api-services": "0.x.x"
   },
   "dependencies": {
     "angular": "1.4.x",
