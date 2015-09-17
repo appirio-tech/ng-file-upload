@@ -99,7 +99,8 @@
 
     File.prototype._deleteFileRecord = function() {
       return this.$fileResource.delete({
-        fileId: this.fileId
+        fileId: this.fileId,
+        filter: 'category=' + this.saveParams.param.category
       }).$promise;
     };
 
@@ -179,7 +180,7 @@
       var xhr = this._xhr;
       var headers = parseHeaders(xhr.getAllResponseHeaders());
       var response = xhr.response;
-      var headersGetter = headersGetter(headers);
+      var headersGetter = makeHeadersGetter(headers);
 
       angular.forEach($http.defaults.transformResponse, function(transformFn) {
         response = transformFn(response, headersGetter);
@@ -193,7 +194,9 @@
     }
 
     function fileRecordSuccess(response) {
-      file.fileId = data.result.content.fileId;
+      var file = this;
+      
+      file.fileId = response.result.content.fileId;
       file.hasErrors = false;
       file.uploading = false;
       file.onSuccess(response);
@@ -217,7 +220,7 @@
       return parsed;
     }
 
-    function headersGetter(parsedHeaders) {
+    function makeHeadersGetter(parsedHeaders) {
       return function(name) {
         if (name) {
           return parsedHeaders[name.toLowerCase()] || null;
