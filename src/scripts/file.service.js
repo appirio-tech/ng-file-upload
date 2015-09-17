@@ -49,27 +49,19 @@
     File.prototype.cancel = function() {
       if (this._xhr) {
         this._xhr.abort();
-      } else {
-        this.onRemove(this);
       }
+
+      this.onRemove(this);
     };
 
     File.prototype.remove = function() {
-      var deferred = $q.defer();
       var file = this;
-
       var $promise = file._deleteFileRecord();
 
-      $promise.then(function(){
+      return $promise.then(function(){
         file.onRemove(file);
-        deferred.resolve();
       });
 
-      $promise.catch(function(){
-        deferred.reject();
-      });
-
-      return deferred.promise;
     };
 
     File.prototype.onStart = function() { /* noop */ };
@@ -91,35 +83,18 @@
 
       file.onStart();
 
-      var $promise = file._getPresignedUrl();
-
-      $promise.then(function(response) {
-        if (!response.result.content) {
-          return file._failed('Could not get presigned URL from server');
-        }
-        
-        file.preSignedUrlUpload = response.result.content.preSignedUrlUpload;
-
-        var xhr = file._xhr = new XMLHttpRequest();
-
-        xhr.upload.onprogress = file._onProgress.bind(file);
-        xhr.onload = file._onLoad.bind(file);
-        xhr.onerror = file._onError.bind(file);
-        xhr.onabort = file._onAbort.bind(file);
-
-        xhr.open('PUT', file.preSignedUrlUpload, true);
-        xhr.setRequestHeader('Content-Type', file.data.type);
-        xhr.send(file.data);
-      });
-
-      $promise.catch(function(data) {
-        file._failed('Could not get presigned URL from server');
-      });
-      
-    };
-
-    File.prototype._createFileRecord = function() {
-      return this.$fileResource.save(this.saveParams).$promise;
+      file._getPresignedUrl()
+        .then(transformResponse)
+        .then(storeFilePath.bind(file))
+        .then(storePresignedUrl.bind(file))
+        .then(uploadToS3.bind(file))
+        .then(checkSuccessCode.bind(file))
+        .then(transformXhrResponse.bind(file))
+        .then(createFileRecord.bind(file))
+        .then(fileRecordSuccess.bind(file))
+        .catch(function(err) {
+          file._failed(err);
+        });
     };
 
     File.prototype._deleteFileRecord = function() {
@@ -136,53 +111,95 @@
       this.progress = Math.round(e.lengthComputable ? e.loaded * 100 / e.total : 0);
     };
 
-    File.prototype._onLoad = function() {
+    File.prototype._failed = function(err) {
       var file = this;
-      var response = file._transformResponse(file._xhr);
-
-      if (file._isSuccessCode(file._xhr.status)) {
-
-        var $promise = file._createFileRecord();
-
-        $promise.then(function(data) {
-          file.fileId = data.result.content.fileId;
-          file.hasErrors = false;
-          file.uploading = false;
-          file.onSuccess(response);
-        });
-
-        $promise.catch(function() {
-          file._failed('Could not create file record in database');
-        });
-
-      } else {
-        file._failed('Could not upload file to S3');
-      }
-
-    };
-
-    File.prototype._onError = function() {
-      var response = this._transformResponse(this._xhr);
-      this._failed('Could not connect to S3');
-    };
-
-    File.prototype._onAbort = function() {
-      this.onRemove(this);
-    };
-
-    File.prototype._failed = function(msg) {
-      var file = this;
-      console.log(msg);
+      console.log(err);
       file.hasErrors = true;
       file.uploading = false;
-      file.onFailure(msg);
+      file.onFailure(err);
     };
 
     //
     // Helper methods
     //
 
-    File.prototype._parseHeaders = function(headers) {
+    function transformResponse(response) {
+      return response.result.content;
+    }
+
+    function storeFilePath(content) {
+      this.saveParams.param.filePath = content.filePath;
+      return content;
+    }
+
+    function storePresignedUrl(content) {
+      var preSignedURL = content.preSignedURL;
+
+      if (preSignedURL) {
+        this.preSignedURL = preSignedURL;
+        return true;
+      } else {
+        throw 'Response from presigned URL request had no presigned URL';
+      }
+    }
+
+    function uploadToS3() {
+      var file = this;
+      var deferred = $q.defer();
+      var xhr = file._xhr = new XMLHttpRequest();
+
+      xhr.upload.onprogress = file._onProgress.bind(file);
+
+      xhr.onload = function() {
+        deferred.resolve();
+      };
+
+      xhr.onerror = function() {
+        deferred.reject();
+      };
+
+      xhr.open('PUT', file.preSignedURL, true);
+      xhr.setRequestHeader('Content-Type', file.data.type);
+      xhr.send(file.data);
+
+      return deferred.promise;
+    }
+
+    function checkSuccessCode() {
+      var status = this._xhr.status;
+
+      if ((status >= 200 && status < 300) || status === 304) {
+        return true;
+      } else {
+        throw 'File upload to S3 failed: ' + status;
+      }
+    }
+
+    function transformXhrResponse() {
+      var xhr = this._xhr;
+      var headers = parseHeaders(xhr.getAllResponseHeaders());
+      var response = xhr.response;
+      var headersGetter = headersGetter(headers);
+
+      angular.forEach($http.defaults.transformResponse, function(transformFn) {
+        response = transformFn(response, headersGetter);
+      });
+
+      return response;
+    }
+
+    function createFileRecord() {
+      return this.$fileResource.save(this.saveParams).$promise;
+    }
+
+    function fileRecordSuccess(response) {
+      file.fileId = data.result.content.fileId;
+      file.hasErrors = false;
+      file.uploading = false;
+      file.onSuccess(response);
+    }
+
+    function parseHeaders(headers) {
       var parsed = {}, key, val, i;
 
       if (!headers) return parsed;
@@ -198,30 +215,16 @@
       });
 
       return parsed;
-    };
+    }
 
-    File.prototype._transformResponse = function(xhr) {
-      var headers = this._parseHeaders(xhr.getAllResponseHeaders());
-      var response = xhr.response;
-      var headersGetter = this._headersGetter(headers);
-      angular.forEach($http.defaults.transformResponse, function(transformFn) {
-        response = transformFn(response, headersGetter);
-      });
-      return response;
-    };
-
-    File.prototype._headersGetter = function(parsedHeaders) {
+    function headersGetter(parsedHeaders) {
       return function(name) {
         if (name) {
           return parsedHeaders[name.toLowerCase()] || null;
         }
         return parsedHeaders;
       };
-    };
-
-    File.prototype._isSuccessCode = function(status) {
-      return (status >= 200 && status < 300) || status === 304;
-    };
+    }
 
     return File;
 
