@@ -14,17 +14,8 @@
     vm.allowMultiple = config.allowMultiple || false;
     vm.uploader = UploaderService.get(config.name);
 
-    if (config.queryUrl) {
-      vm.uploader.populate(config.queryUrl);
-    }
-
     function configUploader() {
-      vm.uploader.config({
-        allowMultiple: config.allowMultiple,
-        fileEndpoint: config.fileEndpoint,
-        urlPresigner: config.urlPresigner,
-        saveParams: config.saveParams
-      });
+      vm.uploader.config(config);
     }
 
     $scope.$watch('config', function(newValue) {
@@ -39,6 +30,12 @@
     $scope.$watch('vm.uploader.hasErrors', function(newValue) {
       $scope.hasErrors = newValue;
     });
+
+    configUploader();
+
+    if (config.query) {
+      vm.uploader.populate();
+    }
 
   }
 

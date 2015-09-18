@@ -22,35 +22,42 @@
     };
 
     var domain = 'https://api.topcoder.com';
-    var workId = '1437501400964-834acc5a-f1ff-472c-beb7-76cd5ea5a1c6';
+    var workId = '1440692631409-73ccb9c7-b0ee-41bf-bef8-56d0ff8d5179';
+    var category = 'work';
+    var assetType = 'specs';
 
-    var assetType = 'brief';
-    vm.uploaderSingleUploading = null;
-    vm.uploaderSingleHasErrors = null;
-    vm.uploaderSingleConfig = {
-      name: 'singleUploader',
-      allowMultiple: false,
-      queryUrl: domain + '/v3/work-files/assets?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
-      urlPresigner: domain + '/v3/work-files/uploadurl',
-      fileEndpoint: domain + '/v3/work-files/:fileId',
-      saveParams: {
-        workId: workId,
-        assetType: "brief"
-      }
-    };
-    
-    assetType = 'specs';
-    vm.uploaderMultipleUploading = null;
-    vm.uploaderMultipleHasErrors = null;
-    vm.uploaderMultipleConfig = {
-      name: 'multipleUploader',
+    vm.uploaderUploading = null;
+    vm.uploaderHasErrors = null;
+    vm.uploaderConfig = {
+      name: 'uploader',
       allowMultiple: true,
-      queryUrl: domain + '/v3/work-files/assets?filter=workId%3D' + workId + '%26assetType%3D' + assetType,
-      urlPresigner: domain + '/v3/work-files/uploadurl',
-      fileEndpoint: domain + '/v3/work-files/:fileId?filter=workId%3D1436372805000-66d14ff5-ec15-410f-8c51-98e18e75f0fe',
-      saveParams: {
-        workId: workId,
-        assetType: "specs"
+      query: {
+        url: domain + '/v3/work-files/assets',
+        params: {
+          filter: 'id=' + workId + '&assetType=' + assetType + '&category=' + category
+        }
+      },
+      presign: {
+        url: domain + '/v3/work-files/uploadurl',
+        params: {
+          id: workId,
+          assetType: assetType,
+          category: category
+        }
+      },
+      createRecord: {
+        url: domain + '/v3/work-files',
+        params: {
+          id: workId,
+          assetType: assetType,
+          category: category
+        }
+      },
+      removeRecord: {
+        url: domain + '/v3/work-files/:fileId',
+        params: {
+          filter: 'category=' + category
+        }
       }
     };
 

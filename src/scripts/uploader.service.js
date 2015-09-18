@@ -9,6 +9,8 @@
   /* @ngInject */
   function UploaderService($q, File, $resource) {
 
+    // This registry allows us to have multiple uploaders sharing this service
+    // Each uploader should have a unique name
     var uploaderRegistry = {};
 
     function getUploader(name) {
@@ -23,8 +25,8 @@
 
     function Uploader() {
       this.files = [];
-      this.uploading = null;
-      this.hasErrors = null;
+      this.uploading = false;
+      this.hasErrors = false;
     }
 
     Uploader.prototype.config = function(options) {
@@ -32,18 +34,35 @@
 
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
-      this.$fileResource = $resource(options.fileEndpoint);
-      this.$presignResource = $resource(options.urlPresigner);
-      this.saveParams = options.saveParams || {};
+
+      this.presign = options.presign || null;
+      this.query = options.query || null;
+      this.createRecord = options.createRecord || null;
+      this.removeRecord = options.removeRecord || null;
+
+      if (options.presign) {
+        this.presign.resource = $resource(options.presign.url);
+      }
+
+      if (options.query) {
+        this.query.resource = $resource(options.query.url);
+      }
+
+      if (options.createRecord) {
+        this.createRecord.resource = $resource(options.createRecord.url);
+      }
+
+      if (options.removeRecord) {
+        this.removeRecord.resource = $resource(options.removeRecord.url);
+      }
     };
 
-    Uploader.prototype.populate = function(queryUrl) {
-      this._populate(queryUrl);
+    Uploader.prototype.populate = function() {
+      this._populate();
     };
 
     Uploader.prototype.add = function(files, options) {
       var uploader = this;
-      options = options || {};
       files = filelistToArray(files);
 
       // Fail if we're trying to add multiple files to a single upload
@@ -74,7 +93,6 @@
     };
 
     Uploader.prototype._add = function(file, options) {
-      options = options || {};
       var deferred = $q.defer();
       var uploader = this;
 
@@ -83,32 +101,32 @@
       var dupePosition = uploader._indexOfFilename(file.name);
       var dupe = dupePosition >= 0;
 
-      var file = uploader._newFile(file, options);
+      var newFile = uploader._newFile(file, options);
 
       if (dupe) {
         if (replace) {
           uploader.files[dupePosition].remove().then(function() {
-            uploader.files[dupePosition] = file;
+            uploader.files[dupePosition] = newFile;
           });
         } else {
           deferred.reject('DUPE');
         }
       } else {
         if (uploader.allowMultiple) {
-          uploader.files.push(file);
+          uploader.files.push(newFile);
         } else {
           if (uploader.files[0]) {
             uploader.files[0].remove().then(function() {
-              uploader.files[0] = file;
+              uploader.files[0] = newFile;
             });
           } else {
-            uploader.files[0] = file;
+            uploader.files[0] = newFile;
           }
         }
       }
 
-      if (file.newFile) {
-        file.start();
+      if (newFile.newFile) {
+        newFile.start();
       }
 
       deferred.resolve();
@@ -116,9 +134,9 @@
       return deferred.promise;
     };
 
-    Uploader.prototype._populate = function(queryUrl) {
+    Uploader.prototype._populate = function() {
       var uploader = this;
-      var $promise = $resource(queryUrl).get().$promise;
+      var $promise = uploader.query.resource.get(uploader.query.params).$promise;
 
       $promise.then(function(data) {
         var files = data.result.content || [];
@@ -136,10 +154,12 @@
 
     Uploader.prototype._newFile = function(file, options) {
       var uploader = this;
+      options = options || {}
 
-      options.$presignResource = uploader.$presignResource;
-      options.$fileResource = uploader.$fileResource;
-      options.saveParams = uploader.saveParams;
+      options.presign = uploader.presign || null;
+      options.query = uploader.query || null;
+      options.createRecord = uploader.createRecord || null;
+      options.removeRecord = uploader.removeRecord || null;
 
       file = new File(file, options);
 

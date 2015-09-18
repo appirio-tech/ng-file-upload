@@ -28,15 +28,9 @@ html(ng-app="example-app", ng-controller="ExampleAppController as vm")
       button(type="submit") Login
     
     ap-uploader(
-      config="vm.uploaderSingleConfig",
-      uploading="vm.uploaderSingleUploading",
-      has-errors="vm.uploaderSingleHasErrors"
-    )
-    
-    ap-uploader(
-      config="vm.uploaderMultipleConfig",
-      uploading="vm.uploaderMultipleUploading",
-      has-errors="vm.uploaderMultipleHasErrors"
+      config="vm.uploaderConfig",
+      uploading="vm.uploaderUploading",
+      has-errors="vm.uploaderHasErrors"
     )
     
     include js-files

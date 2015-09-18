@@ -11,19 +11,17 @@
 
     function File(data, options) {
       var file = this;
+      options = angular.copy(options);
 
       file.data = data;
       file.name = data.name;
       file.newFile = options.newFile !== false;
       file.locked = options.locked || false;
-      file.$fileResource = options.$fileResource;
-      file.$presignResource = options.$presignResource;
 
-      file.saveParams = {};
-      file.saveParams.param = angular.copy(options.saveParams);
-      file.saveParams.param.fileName = file.data.name;
-      file.saveParams.param.fileType = file.data.type;
-      file.saveParams.param.fileSize = file.data.size;
+      file.presign = options.presign || null;
+      file.query = options.query || null;
+      file.createRecord = options.createRecord || null;
+      file.removeRecord = options.removeRecord || null;
 
       if (!file.newFile) {
         file.fileId = options.fileId;
@@ -61,7 +59,6 @@
       return $promise.then(function(){
         file.onRemove(file);
       });
-
     };
 
     File.prototype.onStart = function() { /* noop */ };
@@ -98,14 +95,22 @@
     };
 
     File.prototype._deleteFileRecord = function() {
-      return this.$fileResource.delete({
-        fileId: this.fileId,
-        filter: 'category=' + this.saveParams.param.category
-      }).$promise;
+      var params = this.removeRecord.params || {};
+      params.fileId = this.fileId;
+
+      return this.removeRecord.resource.delete(params).$promise;
     };
 
     File.prototype._getPresignedUrl = function() {
-      return this.$presignResource.save(this.saveParams).$promise;
+      var params = {
+        param: this.presign.params || {}
+      };
+
+      params.param.fileName = this.data.name;
+      params.param.fileType = this.data.type;
+      params.param.fileSize = this.data.size;
+
+      return this.presign.resource.save(params).$promise;
     };
 
     File.prototype._onProgress = function(e) {
@@ -129,19 +134,22 @@
     }
 
     function storeFilePath(content) {
-      this.saveParams.param.filePath = content.filePath;
+      this.createRecord.params.filePath = content.filePath;
       return content;
     }
 
     function storePresignedUrl(content) {
+      var deferred = $q.defer();
       var preSignedURL = content.preSignedURL;
 
       if (preSignedURL) {
         this.preSignedURL = preSignedURL;
-        return true;
+        deferred.resolve()
       } else {
-        throw 'Response from presigned URL request had no presigned URL';
+        deferred.reject('Response from presigned URL request had no presigned URL');
       }
+
+      return deferred.promise;
     }
 
     function uploadToS3() {
@@ -167,13 +175,17 @@
     }
 
     function checkSuccessCode() {
+      var deferred = $q.defer();
       var status = this._xhr.status;
 
       if ((status >= 200 && status < 300) || status === 304) {
-        return true;
+        this.preSignedURL = preSignedURL;
+        deferred.resolve()
       } else {
-        throw 'File upload to S3 failed: ' + status;
+        deferred.reject('File upload to S3 failed: ' + status);
       }
+
+      return deferred.promise;
     }
 
     function transformXhrResponse() {
@@ -190,7 +202,15 @@
     }
 
     function createFileRecord() {
-      return this.$fileResource.save(this.saveParams).$promise;
+      var params = {
+        param: this.createRecord.params || {}
+      };
+
+      params.param.fileName = this.data.name;
+      params.param.fileType = this.data.type;
+      params.param.fileSize = this.data.size;
+
+      return this.createRecord.resource.save(params).$promise;
     }
 
     function fileRecordSuccess(response) {
