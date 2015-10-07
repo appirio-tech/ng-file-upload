@@ -179,7 +179,6 @@
       var status = this._xhr.status;
 
       if ((status >= 200 && status < 300) || status === 304) {
-        this.preSignedURL = preSignedURL;
         deferred.resolve()
       } else {
         deferred.reject('File upload to S3 failed: ' + status);
