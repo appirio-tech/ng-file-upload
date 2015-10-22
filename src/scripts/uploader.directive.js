@@ -10,6 +10,7 @@
       scope: {
         uploading: '=',
         hasErrors: '=',
+        hasFiles: '=',
         config: '='
       },
       controller: 'UploaderController as vm',

@@ -31,6 +31,10 @@
       $scope.hasErrors = newValue;
     });
 
+    $scope.$watch('vm.uploader.hasFiles', function(newValue) {
+      $scope.hasFiles = newValue;
+    });
+
     configUploader();
 
     if (config.query) {
