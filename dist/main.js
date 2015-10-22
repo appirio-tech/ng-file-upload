@@ -35,6 +35,7 @@
       this.files = [];
       this.uploading = false;
       this.hasErrors = false;
+      this.hasFiles = false;
     }
 
     Uploader.prototype.config = function(options) {
@@ -98,6 +99,7 @@
 
       uploader.uploading = uploading;
       uploader.hasErrors = hasErrors;
+      uploader.hasFiles = uploader.files.length > 0
     };
 
     Uploader.prototype._add = function(file, options) {
@@ -135,6 +137,8 @@
 
       if (newFile.newFile) {
         newFile.start();
+      } else {
+        uploader.onUpdate();
       }
 
       deferred.resolve();
@@ -195,11 +199,10 @@
     };
 
     Uploader.prototype._remove = function(file) {
-      var deferred = $q.defer();
       this.files.splice(this._indexOfFilename(file.name), 1);
+      this.onUpdate();
 
-      deferred.resolve();
-      return deferred.promise;
+      return $q.when(true);
     };
 
     Uploader.prototype._indexOfFilename = function(name) {
@@ -519,6 +522,7 @@
       scope: {
         uploading: '=',
         hasErrors: '=',
+        hasFiles: '=',
         config: '='
       },
       controller: 'UploaderController as vm',
@@ -558,6 +562,10 @@
 
     $scope.$watch('vm.uploader.hasErrors', function(newValue) {
       $scope.hasErrors = newValue;
+    });
+
+    $scope.$watch('vm.uploader.hasFiles', function(newValue) {
+      $scope.hasFiles = newValue;
     });
 
     configUploader();
