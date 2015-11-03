@@ -96,7 +96,7 @@
           hasErrors = true;
         }
       });
-
+      uploader.fileArray = filelistToArray(uploader.files);
       uploader.uploading = uploading;
       uploader.hasErrors = hasErrors;
       uploader.hasFiles = uploader.files.length > 0
@@ -523,6 +523,7 @@
         uploading: '=',
         hasErrors: '=',
         hasFiles: '=',
+        fileArray: '=',
         config: '='
       },
       controller: 'UploaderController as vm',
@@ -566,6 +567,10 @@
 
     $scope.$watch('vm.uploader.hasFiles', function(newValue) {
       $scope.hasFiles = newValue;
+    });
+
+    $scope.$watch('vm.uploader.fileArray', function(newValue) {
+      $scope.fileArray = newValue;
     });
 
     configUploader();
