@@ -11,6 +11,7 @@
         uploading: '=',
         hasErrors: '=',
         hasFiles: '=',
+        fileArray: '=',
         config: '='
       },
       controller: 'UploaderController as vm',

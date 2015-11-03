@@ -88,7 +88,7 @@
           hasErrors = true;
         }
       });
-
+      uploader.fileArray = filelistToArray(uploader.files);
       uploader.uploading = uploading;
       uploader.hasErrors = hasErrors;
       uploader.hasFiles = uploader.files.length > 0
