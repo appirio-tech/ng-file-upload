@@ -35,6 +35,7 @@
 
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
+      this.captionsAllowed = options.captionsAllowed || false;
 
       this.presign = options.presign || null;
       this.query = options.query || null;
@@ -164,6 +165,7 @@
       options.query = uploader.query || null;
       options.createRecord = uploader.createRecord || null;
       options.removeRecord = uploader.removeRecord || null;
+      options.captionsAllowed = uploader.captionsAllowed || false;
 
       file = new File(file, options);
 
@@ -186,6 +188,11 @@
       file.onRemove = function(file) {
         uploader._remove(file);
       };
+
+      file.onEditCaption = function(caption) {
+        file.caption = caption;
+        uploader.onUpdate();
+      }
 
       return file;
     };

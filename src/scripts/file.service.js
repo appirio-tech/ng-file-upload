@@ -17,6 +17,7 @@
       file.name = data.name;
       file.newFile = options.newFile !== false;
       file.locked = options.locked || false;
+      file.captionsAllowed = options.captionsAllowed || false;
 
       file.presign = options.presign || null;
       file.query = options.query || null;
