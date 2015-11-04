@@ -10,12 +10,12 @@
   function FileController($scope) {
     var vm = this;
     vm.file = $scope.file;
-    vm.captionsAllowed = $scope.file.captionsAllowed;
+    vm.allowCaptions = vm.file.allowCaptions;
     vm.caption = '';
 
-    vm.addCaption = function () {
+    vm.setCaption = function () {
       if (vm.caption.length) {
-        vm.file.onEditCaption(vm.caption);
+        vm.file.setCaption(vm.caption);
         vm.caption = '';
       }
     }

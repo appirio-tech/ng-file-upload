@@ -14,10 +14,9 @@
       options = angular.copy(options);
 
       file.data = data;
-      file.name = data.name;
       file.newFile = options.newFile !== false;
       file.locked = options.locked || false;
-      file.captionsAllowed = options.captionsAllowed || false;
+      file.allowCaptions = options.allowCaptions || false;
 
       file.presign = options.presign || null;
       file.query = options.query || null;
@@ -25,7 +24,6 @@
       file.removeRecord = options.removeRecord || null;
 
       if (!file.newFile) {
-        file.fileId = options.fileId;
         file.uploading = false;
         file.hasErrors = false;
       }
@@ -62,11 +60,27 @@
       });
     };
 
+    File.prototype.setCaption = function(caption) {
+      var file = this;
+
+      file.data.caption = caption;
+
+      file.onCaptionChange({
+        caption: file.data.caption,
+        id: file.data.id,
+        name: file.data.name,
+        path: file.data.path,
+        size: file.data.size,
+        type: file.data.type
+      });
+    };
+
     File.prototype.onStart = function() { /* noop */ };
     File.prototype.onRemove = function() { /* noop */ };
     File.prototype.onProgress = function() { /* noop */ };
     File.prototype.onSuccess = function() { /* noop */ };
     File.prototype.onFailure = function() { /* noop */ };
+    File.prototype.onCaptionChange = function() { /* noop */ };
 
     //
     // Private methods
@@ -97,7 +111,7 @@
 
     File.prototype._deleteFileRecord = function() {
       var params = this.removeRecord.params || {};
-      params.fileId = this.fileId;
+      params.fileId = this.data.id;
 
       return this.removeRecord.resource.delete(params).$promise;
     };
@@ -135,7 +149,9 @@
     }
 
     function storeFilePath(content) {
-      this.createRecord.params.filePath = content.filePath;
+      var file = this;
+
+      file.data.path = content.filePath;
       return content;
     }
 
@@ -207,6 +223,7 @@
       };
 
       params.param.fileName = this.data.name;
+      params.param.filePath = this.data.path;
       params.param.fileType = this.data.type;
       params.param.fileSize = this.data.size;
 
@@ -216,7 +233,7 @@
     function fileRecordSuccess(response) {
       var file = this;
       
-      file.fileId = response.result.content.fileId;
+      file.data.id = response.result.content.fileId;
       file.hasErrors = false;
       file.uploading = false;
       file.onSuccess(response);
