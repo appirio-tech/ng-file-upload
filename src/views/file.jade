@@ -1,9 +1,15 @@
 .uploader(ng-class="{'failed': vm.file.hasErrors}")
   .fileName
-    span {{vm.file.name}}
+    span {{vm.file.data.name}}
   .fileActions
     button(ng-show="vm.file.uploading", ng-click="vm.file.cancel()" type="button") Cancel
     button(ng-show="!vm.file.uploading", ng-click="vm.file.remove()" type="button") Remove
     button(ng-show="vm.file.hasErrors", ng-click="vm.file.retry()" type="button") Retry
+
     p(ng-show="vm.file.hasErrors") Upload Failed
+
     progress(ng-show="vm.file.uploading", value="{{vm.file.progress}}", max="100") {{vm.file.progress}}%
+
+    p(ng-if="vm.file.data.caption") {{vm.file.data.caption}}
+    input(ng-if="vm.allowCaptions" type="text" ng-model="vm.caption")
+    button(ng-if="vm.allowCaptions" ng-click="vm.setCaption()") Edit Caption

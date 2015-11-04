@@ -10,6 +10,15 @@
   function FileController($scope) {
     var vm = this;
     vm.file = $scope.file;
+    vm.allowCaptions = vm.file.allowCaptions;
+    vm.caption = '';
+
+    vm.setCaption = function () {
+      if (vm.caption.length) {
+        vm.file.setCaption(vm.caption);
+        vm.caption = '';
+      }
+    }
   }
-  
+
 })();

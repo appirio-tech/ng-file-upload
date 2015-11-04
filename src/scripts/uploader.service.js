@@ -30,16 +30,23 @@
       this.hasFiles = false;
     }
 
+    Uploader.prototype.onCaptionChange = function() { /* noop */ };
+
     Uploader.prototype.config = function(options) {
       options = options || {};
 
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
+      this.allowCaptions = options.allowCaptions || false;
 
       this.presign = options.presign || null;
       this.query = options.query || null;
       this.createRecord = options.createRecord || null;
       this.removeRecord = options.removeRecord || null;
+
+      if (options.onCaptionChange) {
+        this.onCaptionChange = options.onCaptionChange;
+      }
 
       if (options.presign) {
         this.presign.resource = $resource(options.presign.url);
@@ -94,16 +101,16 @@
       uploader.hasFiles = uploader.files.length > 0
     };
 
-    Uploader.prototype._add = function(file, options) {
+    Uploader.prototype._add = function(fileData, options) {
       var deferred = $q.defer();
       var uploader = this;
 
       // TODO: Prompt user to confirm replacing file
       var replace = true;
-      var dupePosition = uploader._indexOfFilename(file.name);
+      var dupePosition = uploader._indexOfFilename(fileData.name);
       var dupe = dupePosition >= 0;
 
-      var newFile = uploader._newFile(file, options);
+      var newFile = uploader._newFile(fileData, options);
 
       if (dupe) {
         if (replace) {
@@ -147,10 +154,13 @@
 
         files.forEach(function(file) {
           uploader._add({
-            name: file.fileName
+            id: file.fileId,
+            name: file.fileName,
+            path: file.filePath,
+            size: file.fileSize,
+            type: file.fileType
           }, {
             newFile: false,
-            fileId: file.fileId
           });
         });
       });
@@ -164,6 +174,7 @@
       options.query = uploader.query || null;
       options.createRecord = uploader.createRecord || null;
       options.removeRecord = uploader.removeRecord || null;
+      options.allowCaptions = uploader.allowCaptions || false;
 
       file = new File(file, options);
 
@@ -187,11 +198,16 @@
         uploader._remove(file);
       };
 
+      file.onCaptionChange = function(fileData) {
+        uploader.onCaptionChange(fileData)
+        uploader.onUpdate();
+      }
+
       return file;
     };
 
     Uploader.prototype._remove = function(file) {
-      this.files.splice(this._indexOfFilename(file.name), 1);
+      this.files.splice(this._indexOfFilename(file.data.name), 1);
       this.onUpdate();
 
       return $q.when(true);
@@ -201,7 +217,7 @@
       var uploader = this;
 
       for (var i = 0; i < uploader.files.length; i++) {
-        if (uploader.files[i].name === name) return i;
+        if (uploader.files[i].data.name === name) return i;
       }
 
       return -1;
