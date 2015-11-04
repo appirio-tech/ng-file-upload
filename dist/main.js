@@ -38,16 +38,23 @@
       this.hasFiles = false;
     }
 
+    Uploader.prototype.onCaptionChange = function() { /* noop */ };
+
     Uploader.prototype.config = function(options) {
       options = options || {};
 
       this.allowMultiple = options.allowMultiple || false;
       this.allowDuplicates = options.allowDuplicates || false;
+      this.allowCaptions = options.allowCaptions || false;
 
       this.presign = options.presign || null;
       this.query = options.query || null;
       this.createRecord = options.createRecord || null;
       this.removeRecord = options.removeRecord || null;
+
+      if (options.onCaptionChange) {
+        this.onCaptionChange = options.onCaptionChange;
+      }
 
       if (options.presign) {
         this.presign.resource = $resource(options.presign.url);
@@ -102,16 +109,16 @@
       uploader.hasFiles = uploader.files.length > 0
     };
 
-    Uploader.prototype._add = function(file, options) {
+    Uploader.prototype._add = function(fileData, options) {
       var deferred = $q.defer();
       var uploader = this;
 
       // TODO: Prompt user to confirm replacing file
       var replace = true;
-      var dupePosition = uploader._indexOfFilename(file.name);
+      var dupePosition = uploader._indexOfFilename(fileData.name);
       var dupe = dupePosition >= 0;
 
-      var newFile = uploader._newFile(file, options);
+      var newFile = uploader._newFile(fileData, options);
 
       if (dupe) {
         if (replace) {
@@ -155,10 +162,13 @@
 
         files.forEach(function(file) {
           uploader._add({
-            name: file.fileName
+            id: file.fileId,
+            name: file.fileName,
+            path: file.filePath,
+            size: file.fileSize,
+            type: file.fileType
           }, {
             newFile: false,
-            fileId: file.fileId
           });
         });
       });
@@ -172,6 +182,7 @@
       options.query = uploader.query || null;
       options.createRecord = uploader.createRecord || null;
       options.removeRecord = uploader.removeRecord || null;
+      options.allowCaptions = uploader.allowCaptions || false;
 
       file = new File(file, options);
 
@@ -195,11 +206,16 @@
         uploader._remove(file);
       };
 
+      file.onCaptionChange = function(fileData) {
+        uploader.onCaptionChange(fileData)
+        uploader.onUpdate();
+      }
+
       return file;
     };
 
     Uploader.prototype._remove = function(file) {
-      this.files.splice(this._indexOfFilename(file.name), 1);
+      this.files.splice(this._indexOfFilename(file.data.name), 1);
       this.onUpdate();
 
       return $q.when(true);
@@ -209,7 +225,7 @@
       var uploader = this;
 
       for (var i = 0; i < uploader.files.length; i++) {
-        if (uploader.files[i].name === name) return i;
+        if (uploader.files[i].data.name === name) return i;
       }
 
       return -1;
@@ -246,9 +262,9 @@
       options = angular.copy(options);
 
       file.data = data;
-      file.name = data.name;
       file.newFile = options.newFile !== false;
       file.locked = options.locked || false;
+      file.allowCaptions = options.allowCaptions || false;
 
       file.presign = options.presign || null;
       file.query = options.query || null;
@@ -256,7 +272,6 @@
       file.removeRecord = options.removeRecord || null;
 
       if (!file.newFile) {
-        file.fileId = options.fileId;
         file.uploading = false;
         file.hasErrors = false;
       }
@@ -293,11 +308,27 @@
       });
     };
 
+    File.prototype.setCaption = function(caption) {
+      var file = this;
+
+      file.data.caption = caption;
+
+      file.onCaptionChange({
+        caption: file.data.caption,
+        id: file.data.id,
+        name: file.data.name,
+        path: file.data.path,
+        size: file.data.size,
+        type: file.data.type
+      });
+    };
+
     File.prototype.onStart = function() { /* noop */ };
     File.prototype.onRemove = function() { /* noop */ };
     File.prototype.onProgress = function() { /* noop */ };
     File.prototype.onSuccess = function() { /* noop */ };
     File.prototype.onFailure = function() { /* noop */ };
+    File.prototype.onCaptionChange = function() { /* noop */ };
 
     //
     // Private methods
@@ -328,7 +359,7 @@
 
     File.prototype._deleteFileRecord = function() {
       var params = this.removeRecord.params || {};
-      params.fileId = this.fileId;
+      params.fileId = this.data.id;
 
       return this.removeRecord.resource.delete(params).$promise;
     };
@@ -366,7 +397,9 @@
     }
 
     function storeFilePath(content) {
-      this.createRecord.params.filePath = content.filePath;
+      var file = this;
+
+      file.data.path = content.filePath;
       return content;
     }
 
@@ -438,6 +471,7 @@
       };
 
       params.param.fileName = this.data.name;
+      params.param.filePath = this.data.path;
       params.param.fileType = this.data.type;
       params.param.fileSize = this.data.size;
 
@@ -447,7 +481,7 @@
     function fileRecordSuccess(response) {
       var file = this;
       
-      file.fileId = response.result.content.fileId;
+      file.data.id = response.result.content.fileId;
       file.hasErrors = false;
       file.uploading = false;
       file.onSuccess(response);
@@ -613,9 +647,18 @@
   function FileController($scope) {
     var vm = this;
     vm.file = $scope.file;
+    vm.allowCaptions = vm.file.allowCaptions;
+    vm.caption = '';
+
+    vm.setCaption = function () {
+      if (vm.caption.length) {
+        vm.file.setCaption(vm.caption);
+        vm.caption = '';
+      }
+    }
   }
-  
+
 })();
 
-angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"{\'failed\': vm.file.hasErrors}\" class=\"uploader\"><div class=\"fileName\"><span>{{vm.file.name}}</span></div><div class=\"fileActions\"><button ng-show=\"vm.file.uploading\" ng-click=\"vm.file.cancel()\" type=\"button\">Cancel</button><button ng-show=\"!vm.file.uploading\" ng-click=\"vm.file.remove()\" type=\"button\">Remove</button><button ng-show=\"vm.file.hasErrors\" ng-click=\"vm.file.retry()\" type=\"button\">Retry</button><p ng-show=\"vm.file.hasErrors\">Upload Failed</p><progress ng-show=\"vm.file.uploading\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress></div></div>");
+angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"{\'failed\': vm.file.hasErrors}\" class=\"uploader\"><div class=\"fileName\"><span>{{vm.file.data.name}}</span></div><div class=\"fileActions\"><button ng-show=\"vm.file.uploading\" ng-click=\"vm.file.cancel()\" type=\"button\">Cancel</button><button ng-show=\"!vm.file.uploading\" ng-click=\"vm.file.remove()\" type=\"button\">Remove</button><button ng-show=\"vm.file.hasErrors\" ng-click=\"vm.file.retry()\" type=\"button\">Retry</button><p ng-show=\"vm.file.hasErrors\">Upload Failed</p><progress ng-show=\"vm.file.uploading\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress><p ng-if=\"vm.file.data.caption\">{{vm.file.data.caption}}</p><input ng-if=\"vm.allowCaptions\" type=\"text\" ng-model=\"vm.caption\"/><button ng-if=\"vm.allowCaptions\" ng-click=\"vm.setCaption()\">Edit Caption</button></div></div>");
 $templateCache.put("uploader.html","<div class=\"uploaderWrapper\"><input ng-if=\"vm.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul class=\"uploaderFiles\"><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
