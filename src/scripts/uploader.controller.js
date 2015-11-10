@@ -19,7 +19,11 @@
     }
 
     $scope.$watch('config', function(newValue) {
-      config = newValue || {};
+      if((oldValue === undefined && newValue) ||
+          (oldValue && oldValue.name !== newValue.name)) {
+        config = newValue;
+        vm.uploader = UploaderService.get(config.name);
+      }
       configUploader();
     }, true);
 
