@@ -103,7 +103,6 @@
           hasErrors = true;
         }
       });
-      uploader.fileArray = filelistToArray(uploader.files);
       uploader.uploading = uploading;
       uploader.hasErrors = hasErrors;
       uploader.hasFiles = uploader.files.length > 0
@@ -124,6 +123,7 @@
         if (replace) {
           uploader.files[dupePosition].remove().then(function() {
             uploader.files[dupePosition] = newFile;
+            uploader.onUpdate();
           });
         } else {
           deferred.reject('DUPE');
