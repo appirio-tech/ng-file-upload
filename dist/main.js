@@ -160,6 +160,19 @@
       $promise.then(function(data) {
         var files = data.result.content || [];
 
+        files = [
+          { fileId: 'a', fileName: 'a.png' },
+          { fileId: 'b', fileName: 'b.png' },
+          { fileId: 'c', fileName: 'c.png' },
+          { fileId: 'd', fileName: 'd.png' },
+          { fileId: 'e', fileName: 'e.png' },
+          { fileId: 'f', fileName: 'f.png' },
+          { fileId: 'g', fileName: 'g.png' },
+          { fileId: 'h', fileName: 'h.png' },
+          { fileId: 'i', fileName: 'i.png' },
+          { fileId: 'j', fileName: 'j.png' },
+        ];
+
         files.forEach(function(file) {
           uploader._add({
             id: file.fileId,
@@ -661,4 +674,4 @@
 })();
 
 angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"{\'failed\': vm.file.hasErrors}\" class=\"uploader\"><div class=\"fileName\"><span>{{vm.file.data.name}}</span></div><div class=\"fileActions\"><button ng-show=\"vm.file.uploading\" ng-click=\"vm.file.cancel()\" type=\"button\">Cancel</button><button ng-show=\"!vm.file.uploading\" ng-click=\"vm.file.remove()\" type=\"button\">Remove</button><button ng-show=\"vm.file.hasErrors\" ng-click=\"vm.file.retry()\" type=\"button\">Retry</button><p ng-show=\"vm.file.hasErrors\">Upload Failed</p><progress ng-show=\"vm.file.uploading\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress><p ng-if=\"vm.file.data.caption\">{{vm.file.data.caption}}</p><input ng-if=\"vm.allowCaptions\" type=\"text\" ng-model=\"vm.caption\"/><button ng-if=\"vm.allowCaptions\" ng-click=\"vm.setCaption()\">Edit Caption</button></div></div>");
-$templateCache.put("uploader.html","<div class=\"uploaderWrapper\"><input ng-if=\"vm.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><input ng-if=\"!vm.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\"/><ul class=\"uploaderFiles\"><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
+$templateCache.put("uploader.html","<div class=\"uploaderWrapper\"><input ng-if=\"vm.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/><input ng-if=\"!vm.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/><ul class=\"uploaderFiles\"><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
