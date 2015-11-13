@@ -152,6 +152,19 @@
       $promise.then(function(data) {
         var files = data.result.content || [];
 
+        files = [
+          { fileId: 'a', fileName: 'a.png' },
+          { fileId: 'b', fileName: 'b.png' },
+          { fileId: 'c', fileName: 'c.png' },
+          { fileId: 'd', fileName: 'd.png' },
+          { fileId: 'e', fileName: 'e.png' },
+          { fileId: 'f', fileName: 'f.png' },
+          { fileId: 'g', fileName: 'g.png' },
+          { fileId: 'h', fileName: 'h.png' },
+          { fileId: 'i', fileName: 'i.png' },
+          { fileId: 'j', fileName: 'j.png' },
+        ];
+
         files.forEach(function(file) {
           uploader._add({
             id: file.fileId,

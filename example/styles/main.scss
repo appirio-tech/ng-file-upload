@@ -1,0 +1,14 @@
+@import "work-styles";
+
+body #example-nav {
+  position        : fixed;
+  bottom          : 0px;
+  background-color: $white;
+  opacity         : 0.6;
+  z-index         : 1001;
+
+  a {
+    margin: 10px;
+    display: inline-block;
+  }
+}
