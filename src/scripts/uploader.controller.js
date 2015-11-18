@@ -9,46 +9,47 @@
 
   function UploaderController($scope, UploaderService) {
     var vm = this;
-    var config = $scope.config || {};
 
-    vm.allowMultiple = config.allowMultiple || false;
-    vm.uploader = UploaderService.get(config.name);
-
-    function configUploader() {
-      vm.uploader.config(config);
-    }
-
-    $scope.$watch('config', function(newValue) {
-      if((oldValue === undefined && newValue) ||
-          (oldValue && oldValue.name !== newValue.name)) {
-        config = newValue;
-        vm.uploader = UploaderService.get(config.name);
+    function configUploader(newConfig, oldConfig) {
+      if (newConfig === undefined) {
+        return false;
       }
-      configUploader();
-    }, true);
 
-    $scope.$watch('vm.uploader.uploading', function(newValue) {
-      $scope.uploading = newValue;
-    });
+      var oldName = oldConfig ? oldConfig.name : undefined;
+      if (newConfig.name !== oldName) {
+        vm.uploader = UploaderService.get(newConfig.name);
+      }
 
-    $scope.$watch('vm.uploader.hasErrors', function(newValue) {
-      $scope.hasErrors = newValue;
-    });
+      vm.config = newConfig;
+      vm.uploader.config(vm.config);
 
-    $scope.$watch('vm.uploader.hasFiles', function(newValue) {
-      $scope.hasFiles = newValue;
-    });
+      var oldQuery = oldConfig ? oldConfig.query : undefined;
+      if (newConfig.query && newConfig.query !== oldQuery) {
+        vm.uploader.populate();
+      }
 
-    $scope.$watch('vm.uploader.fileArray', function(newValue) {
-      $scope.fileArray = newValue;
-    });
+      if (newConfig && !oldConfig) {
+        $scope.$watch('vm.uploader.uploading', function(newValue) {
+          $scope.uploading = newValue;
+        });
 
-    configUploader();
+        $scope.$watch('vm.uploader.hasErrors', function(newValue) {
+          $scope.hasErrors = newValue;
+        });
 
-    if (config.query) {
-      vm.uploader.populate();
+        $scope.$watch('vm.uploader.hasFiles', function(newValue) {
+          $scope.hasFiles = newValue;
+        });
+
+        $scope.$watch('vm.uploader.fileArray', function(newValue) {
+          $scope.fileArray = newValue;
+        });
+      }
     }
 
+    $scope.$watch('config', configUploader, true);
+
+    configUploader($scope.config);
   }
 
 })();
