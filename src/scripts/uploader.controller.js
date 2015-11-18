@@ -9,42 +9,47 @@
 
   function UploaderController($scope, UploaderService) {
     var vm = this;
-    var config = $scope.config || {};
 
-    vm.allowMultiple = config.allowMultiple || false;
-    vm.uploader = UploaderService.get(config.name);
+    function configUploader(newConfig, oldConfig) {
+      if (newConfig === undefined) {
+        return false;
+      }
 
-    function configUploader() {
-      vm.uploader.config(config);
+      var oldName = oldConfig ? oldConfig.name : undefined;
+      if (newConfig.name !== oldName) {
+        vm.uploader = UploaderService.get(newConfig.name);
+      }
+
+      vm.config = newConfig;
+      vm.uploader.config(vm.config);
+
+      var oldQuery = oldConfig ? oldConfig.query : undefined;
+      if (newConfig.query && newConfig.query !== oldQuery) {
+        vm.uploader.populate();
+      }
+
+      if (newConfig && !oldConfig) {
+        $scope.$watch('vm.uploader.uploading', function(newValue) {
+          $scope.uploading = newValue;
+        });
+
+        $scope.$watch('vm.uploader.hasErrors', function(newValue) {
+          $scope.hasErrors = newValue;
+        });
+
+        $scope.$watch('vm.uploader.hasFiles', function(newValue) {
+          $scope.hasFiles = newValue;
+        });
+
+        $scope.$watch('vm.uploader.fileArray', function(newValue) {
+          $scope.fileArray = newValue;
+        });
+      }
     }
 
-    $scope.$watch('config', function(newValue) {
-      config = newValue || {};
-      configUploader();
-    }, true);
+    $scope.$watch('config', configUploader, true);
 
-    $scope.$watch('vm.uploader.uploading', function(newValue) {
-      $scope.uploading = newValue;
-    });
-
-    $scope.$watch('vm.uploader.hasErrors', function(newValue) {
-      $scope.hasErrors = newValue;
-    });
-
-    $scope.$watch('vm.uploader.hasFiles', function(newValue) {
-      $scope.hasFiles = newValue;
-    });
-
-    $scope.$watch('vm.uploader.fileArray', function(newValue) {
-      $scope.fileArray = newValue;
-    });
-
-    configUploader();
-
-    if (config.query) {
-      vm.uploader.populate();
-    }
-
+    configUploader($scope.config);
   }
 
 })();
