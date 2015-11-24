@@ -11,7 +11,7 @@
         file: '='
       },
       controller: 'FileController as vm',
-      templateUrl: 'file.html'
+      templateUrl: 'views/file.directive.html'
     }
   };
 

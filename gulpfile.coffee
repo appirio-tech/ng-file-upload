@@ -2,18 +2,18 @@ configs =
   __dirname : __dirname
 
 configs.templateCache = []
+
 configs.templateCache.push
-  files : [
-    '.tmp/views/**/*.html'
-  ]
-  root  : ''
+  fileName: 'templates.js'
+  files : ['.tmp/views/*.directive.html']
+  root  : 'views/'
   module: 'ap-file-upload'
 
-configs.fixture =
-  files: 'bower_components/appirio-tech-api-schemas/**/*.json'
-
-configs.useref =
-  searchPath: ['.tmp', 'src', '.']
+configs.templateCache.push
+  fileName: 'example-templates.js'
+  files : ['.tmp/views/*.example.html']
+  root  : 'views/'
+  module: 'example'
 
 ### END CONFIG ###
 loadTasksModule = require __dirname + '/node_modules/appirio-gulp-tasks/load-tasks.coffee'
