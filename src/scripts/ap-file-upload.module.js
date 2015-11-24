@@ -2,7 +2,8 @@
   'use strict';
 
   angular.module('ap-file-upload', [
-    'ngResource'
+    'ngResource',
+    'appirio-tech-ng-ui-components'
   ]);
 
 })();

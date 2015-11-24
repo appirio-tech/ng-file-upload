@@ -1,5 +1,14 @@
 @import "work-includes";
 
+
+ap-uploader {
+  display: block;
+
+  uploaded-files {
+    margin-bottom: 20px;
+  }
+}
+
 .uploaderFiles {
   height: 40vh;
   overflow: auto;

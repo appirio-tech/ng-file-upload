@@ -1,5 +1,4 @@
 @import "work-includes";
-@import "mixins";
 
 ap-file {
   display: block;
@@ -38,8 +37,7 @@ ap-file {
     }
 
     img {
-      opacity: .5;
+      opacity: .60;
     }
   }
-
 }
