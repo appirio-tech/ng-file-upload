@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('example-app')
+    .module('example')
     .controller('ExampleAppController', ExampleAppController);
 
   ExampleAppController.$inject = ['$scope', 'AuthService'];

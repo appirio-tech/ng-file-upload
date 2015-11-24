@@ -1,8 +1,0 @@
-.uploaderWrapper(ng-if="vm.config")
-
-  input(ng-if="vm.config.allowMultiple", multiple="", type="file" on-file-change="vm.uploader.add(fileList)" class="choose-files")
-  input(ng-if="!vm.config.allowMultiple", type="file" on-file-change="vm.uploader.add(fileList)" class="choose-files")
-
-  ul.uploaderFiles
-    li(ng-repeat="file in vm.uploader.files")
-      ap-file(file="file")

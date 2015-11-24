@@ -1,18 +1,23 @@
 doctype html
-html(ng-app="example-app", ng-controller="ExampleAppController as vm")
+html(ng-app='example')
   head
+    = "\n"
+    // removeIf(production)
+    = "\n"
+
+    script(type="text/javascript", src="/scripts/json-fixtures.js")
+
     script(type="text/javascript", src="/bower_components/sinon/index.js")
+
     script(type="text/javascript", src="/bower_components/auto-config-fake-server/dist/auto-config-fake-server.js")
-    script(type="text/javascript", src="scripts/json-fixtures.js")
-    script(type="text/javascript").
-      AutoConfigFakeServer.init();
-      AutoConfigFakeServer.fakeServer.autoRespond = true;
-      schemas = [
-        FIXTURES['bower_components/appirio-tech-api-schemas/apiary/apworkmicroservice.json']
-      ];
-      AutoConfigFakeServer.consume(schemas);
-      
-    title File Uploader
+
+    script(type="text/javascript", src="/scripts/mock.js")
+
+    = "\n"
+    // endRemoveIf(production)
+    = "\n"
+
+    title Example
 
     meta(charset='utf-8')
 
@@ -22,17 +27,15 @@ html(ng-app="example-app", ng-controller="ExampleAppController as vm")
 
     include css-files
 
-  body
+    script(src="//use.typekit.net/jjo6pal.js")
 
-    form(ng-hide="vm.authenticated", ng-submit="vm.login(this)")
-      input(type="text", name="username", placeholder="username", ng-model="vm.username")
-      input(type="password", name="password", placeholder="password", ng-model="vm.password")
-      button(type="submit") Login
-    
-    ap-uploader(
-      config="vm.uploaderConfig",
-      uploading="vm.uploaderUploading",
-      has-errors="vm.uploaderHasErrors"
-    )
-    
+    script.
+      try{Typekit.load({ async: true });}catch(e){}
+
+  body
+    include nav
+
+    ui-view
+
     include js-files
+

@@ -15,7 +15,7 @@
         config: '='
       },
       controller: 'UploaderController as vm',
-      templateUrl: 'uploader.html'
+      templateUrl: 'views/uploader.directive.html'
     }
   };
 
