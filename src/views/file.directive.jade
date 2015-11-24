@@ -19,9 +19,9 @@
     button.clean(ng-show="!vm.file.uploading" ng-click="vm.file.remove()" type="button")
       .icon.cross
 
-  p(ng-if="vm.file.data.caption") {{ vm.file.data.caption }}
-
-  .fileActions
-    input(ng-if="vm.allowCaptions" type="text" ng-model="vm.caption")
-
-    button(ng-if="vm.allowCaptions" ng-click="vm.setCaption()") Edit Caption
+  textarea(
+    ng-if="vm.allowCaptions"
+    ng-model="vm.file.data.caption"
+    ng-blur="vm.setCaption()"
+    placeholder="enter a caption"
+  )

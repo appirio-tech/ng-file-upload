@@ -9,22 +9,24 @@ FileExampleController = ($scope) ->
       progress: 50
       data:
         name: 'this is a very very long name aalalala alla la alex.jpg'
-        caption: 'is awesome!'
+        caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
 
     vm.fileB =
       uploading: false
       progress: 100
+      allowCaptions: true
       data:
         name: 'samin.jpg'
-        caption: 'is awesome!'
+        caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
 
     vm.fileC =
       uploading: false
       progress: 100
       hasErrors: true
+      allowCaptions: true
       data:
         name: 'andrew.jpg'
-        caption: 'is awesome!'
+        caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
 
     vm
 

@@ -44,4 +44,16 @@ ap-file {
       opacity: .60;
     }
   }
+
+  textarea {
+    margin-top: 10px;
+    width: 100%;
+    border-width: 0;
+    color: $text-color-lightest;
+
+    &:focus {
+      border-width: 1px;
+      color: $text-color;
+    }
+  }
 }
