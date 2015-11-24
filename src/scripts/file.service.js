@@ -98,6 +98,7 @@
       file._getPresignedUrl()
         .then(transformResponse)
         .then(storeFilePath.bind(file))
+        .then(storeFileId.bind(file))
         .then(storePresignedUrl.bind(file))
         .then(uploadToS3.bind(file))
         .then(checkSuccessCode.bind(file))
@@ -152,6 +153,16 @@
       var file = this;
 
       file.data.path = content.filePath;
+      return content;
+    }
+
+    function storeFileId(content) {
+      var file = this;
+
+      if (!file.createRecord) {
+        file.data.id = content.fileId;
+      }
+
       return content;
     }
 
@@ -218,25 +229,42 @@
     }
 
     function createFileRecord() {
-      var params = {
-        param: this.createRecord.params || {}
-      };
+      if (this.createRecord) {
+        var params = {
+          param: this.createRecord.params || {}
+        };
 
-      params.param.fileName = this.data.name;
-      params.param.filePath = this.data.path;
-      params.param.fileType = this.data.type;
-      params.param.fileSize = this.data.size;
+        params.param.fileName = this.data.name;
+        params.param.filePath = this.data.path;
+        params.param.fileType = this.data.type;
+        params.param.fileSize = this.data.size;
 
-      return this.createRecord.resource.save(params).$promise;
+        return this.createRecord.resource.save(params).$promise;
+      } else {
+        return this.data;
+      }
     }
 
     function fileRecordSuccess(response) {
       var file = this;
-      
-      file.data.id = response.result.content.fileId;
+
+      if (response.result) {
+        file.data.id = response.result.content.fileId;
+      } else {
+        file.data.id = response.id
+      }
+
+      var filedata = {
+        id: file.data.id,
+        name: file.data.name,
+        path: file.data.path,
+        size: file.data.size,
+        type: file.data.type
+      }
+
       file.hasErrors = false;
       file.uploading = false;
-      file.onSuccess(response);
+      file.onSuccess(response, filedata);
     }
 
     function parseHeaders(headers) {

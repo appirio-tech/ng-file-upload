@@ -32,6 +32,8 @@
 
     Uploader.prototype.onCaptionChange = function() { /* noop */ };
 
+    Uploader.prototype.onUploadSuccess = function() { /* noop */ };
+
     Uploader.prototype.config = function(options) {
       options = options || {};
 
@@ -47,6 +49,11 @@
       if (options.onCaptionChange) {
         this.onCaptionChange = options.onCaptionChange;
       }
+
+      if (options.onUploadSuccess) {
+        this.onUploadSuccess = options.onUploadSuccess;
+      }
+
 
       if (options.presign) {
         this.presign.resource = $resource(options.presign.url);
@@ -186,7 +193,8 @@
         uploader.onUpdate();
       };
 
-      file.onSuccess = function(response) {
+      file.onSuccess = function(response, filedata) {
+        uploader.onUploadSuccess(filedata);
         uploader.onUpdate();
       };
 
