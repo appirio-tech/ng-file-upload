@@ -21,6 +21,10 @@ ap-file {
 
   footer {
     margin-top: 5px;
+
+    p {
+      @include ellipsis(180px);
+    }
   }
 
   .progress-house {

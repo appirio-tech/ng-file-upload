@@ -8,7 +8,7 @@ FileExampleController = ($scope) ->
       uploading: true
       progress: 50
       data:
-        name: 'alex.jpg'
+        name: 'this is a very very long name aalalala alla la alex.jpg'
         caption: 'is awesome!'
 
     vm.fileB =
