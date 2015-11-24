@@ -2,7 +2,8 @@
   'use strict';
 
   angular.module('ap-file-upload', [
-    'ngResource'
+    'ngResource',
+    'appirio-tech-ng-ui-components'
   ]);
 
 })();
@@ -561,7 +562,7 @@
         config: '='
       },
       controller: 'UploaderController as vm',
-      templateUrl: 'uploader.html'
+      templateUrl: 'views/uploader.directive.html'
     }
   };
 
@@ -577,42 +578,47 @@
 
   function UploaderController($scope, UploaderService) {
     var vm = this;
-    var config = $scope.config || {};
 
-    vm.allowMultiple = config.allowMultiple || false;
-    vm.uploader = UploaderService.get(config.name);
+    function configUploader(newConfig, oldConfig) {
+      if (newConfig === undefined) {
+        return false;
+      }
 
-    function configUploader() {
-      vm.uploader.config(config);
+      var oldName = oldConfig ? oldConfig.name : undefined;
+      if (newConfig.name !== oldName) {
+        vm.uploader = UploaderService.get(newConfig.name);
+      }
+
+      vm.config = newConfig;
+      vm.uploader.config(vm.config);
+
+      var oldQuery = oldConfig ? oldConfig.query : undefined;
+      if (newConfig.query && newConfig.query !== oldQuery) {
+        vm.uploader.populate();
+      }
+
+      if (newConfig && !oldConfig) {
+        $scope.$watch('vm.uploader.uploading', function(newValue) {
+          $scope.uploading = newValue;
+        });
+
+        $scope.$watch('vm.uploader.hasErrors', function(newValue) {
+          $scope.hasErrors = newValue;
+        });
+
+        $scope.$watch('vm.uploader.hasFiles', function(newValue) {
+          $scope.hasFiles = newValue;
+        });
+
+        $scope.$watch('vm.uploader.fileArray', function(newValue) {
+          $scope.fileArray = newValue;
+        });
+      }
     }
 
-    $scope.$watch('config', function(newValue) {
-      config = newValue || {};
-      configUploader();
-    }, true);
+    $scope.$watch('config', configUploader, true);
 
-    $scope.$watch('vm.uploader.uploading', function(newValue) {
-      $scope.uploading = newValue;
-    });
-
-    $scope.$watch('vm.uploader.hasErrors', function(newValue) {
-      $scope.hasErrors = newValue;
-    });
-
-    $scope.$watch('vm.uploader.hasFiles', function(newValue) {
-      $scope.hasFiles = newValue;
-    });
-
-    $scope.$watch('vm.uploader.fileArray', function(newValue) {
-      $scope.fileArray = newValue;
-    });
-
-    configUploader();
-
-    if (config.query) {
-      vm.uploader.populate();
-    }
-
+    configUploader($scope.config);
   }
 
 })();
@@ -630,7 +636,7 @@
         file: '='
       },
       controller: 'FileController as vm',
-      templateUrl: 'file.html'
+      templateUrl: 'views/file.directive.html'
     }
   };
 
@@ -660,5 +666,24 @@
 
 })();
 
-angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("file.html","<div ng-class=\"{\'failed\': vm.file.hasErrors}\" class=\"uploader\"><div class=\"fileName\"><span>{{vm.file.data.name}}</span></div><div class=\"fileActions\"><button ng-show=\"vm.file.uploading\" ng-click=\"vm.file.cancel()\" type=\"button\">Cancel</button><button ng-show=\"!vm.file.uploading\" ng-click=\"vm.file.remove()\" type=\"button\">Remove</button><button ng-show=\"vm.file.hasErrors\" ng-click=\"vm.file.retry()\" type=\"button\">Retry</button><p ng-show=\"vm.file.hasErrors\">Upload Failed</p><progress ng-show=\"vm.file.uploading\" value=\"{{vm.file.progress}}\" max=\"100\">{{vm.file.progress}}%</progress><p ng-if=\"vm.file.data.caption\">{{vm.file.data.caption}}</p><input ng-if=\"vm.allowCaptions\" type=\"text\" ng-model=\"vm.caption\"/><button ng-if=\"vm.allowCaptions\" ng-click=\"vm.setCaption()\">Edit Caption</button></div></div>");
-$templateCache.put("uploader.html","<div class=\"uploaderWrapper\"><input ng-if=\"vm.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/><input ng-if=\"!vm.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/><ul class=\"uploaderFiles\"><li ng-repeat=\"file in vm.uploader.files\"><ap-file file=\"file\"></ap-file></li></ul></div>");}]);
+(function() {
+  'use strict';
+  var directive;
+
+  directive = function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'views/uploaded-files.directive.html',
+      scope: {
+        files: '='
+      }
+    };
+  };
+
+  angular.module('ap-file-upload').directive('uploadedFiles', directive);
+
+}).call(this);
+
+angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("views/file.directive.html","<div ng-class=\"{\'failed\': vm.file.hasErrors}\" class=\"uploader\"><main ng-class=\"{ end: vm.file.uploading}\" class=\"flex column middle center\"><img ng-src=\"/images/icon-document.svg\" ng-hide=\"vm.file.hasErrors || vm.file.uploading\"/><div ng-show=\"vm.file.uploading\" class=\"progress-house\"><progress value=\"{{vm.file.progress}}\" max=\"100\">{{ vm.file.progress }}%</progress></div><div ng-show=\"vm.file.hasErrors\" class=\"failed flex column center\"><img ng-src=\"/images/icon-alert-red.svg\"/><button ng-click=\"vm.file.retry()\" type=\"button\" class=\"clean\">retry</button></div></main><footer class=\"flex space-between\"><p class=\"file-name\">{{ vm.file.data.name }}</p><button ng-show=\"!vm.file.uploading\" ng-click=\"vm.file.remove()\" type=\"button\" class=\"clean\"><div class=\"icon cross\"></div></button></footer><textarea ng-if=\"vm.allowCaptions\" ng-model=\"vm.file.data.caption\" ng-blur=\"vm.setCaption()\" placeholder=\"enter a caption\"></textarea></div>");
+$templateCache.put("views/uploaded-files.directive.html","<ul class=\"flex wrap\"><li ng-repeat=\"file in files\"><ap-file file=\"file\"></ap-file></li></ul>");
+$templateCache.put("views/uploader.directive.html","<div ng-if=\"vm.config\" class=\"flex column center middle\"><uploaded-files files=\"vm.uploader.files\" ng-show=\"vm.uploader.files.length\"></uploaded-files><input ng-if=\"vm.config.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/><input ng-if=\"!vm.config.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/></div>");}]);
