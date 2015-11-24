@@ -1,14 +1,23 @@
 @import "work-styles";
 
 body #example-nav {
-  position        : fixed;
-  bottom          : 0px;
+  position: fixed;
+  bottom: 0;
   background-color: $white;
-  opacity         : 0.6;
-  z-index         : 1001;
+  opacity: 0.6;
+  z-index: 1000;
+
+  li {
+    display: inline-block;
+  }
 
   a {
     margin: 10px;
     display: inline-block;
   }
+}
+
+body {
+  padding: $padding-biggest;
+  background-color: $white;
 }

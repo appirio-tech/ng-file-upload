@@ -1,0 +1,45 @@
+@import "work-includes";
+@import "mixins";
+
+ap-file {
+  display: block;
+  width: 203px;
+
+  main {
+    height: 135px;
+    background-color: $neutral-color-lightest;
+
+    img {
+      width: 35px;
+      height: 35px;
+    }
+  }
+
+  .icon {
+    height: 10px;
+    width: 10px;
+  }
+
+  footer {
+    margin-top: 5px;
+  }
+
+  .progress-house {
+    margin: 0 20px 18px 20px;
+  }
+
+  progress {
+    width: 100%;
+  }
+
+  .failed {
+    button {
+      margin-top: 10px;
+    }
+
+    img {
+      opacity: .5;
+    }
+  }
+
+}

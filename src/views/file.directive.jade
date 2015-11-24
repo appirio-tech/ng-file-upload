@@ -1,0 +1,27 @@
+.uploader(ng-class="{'failed': vm.file.hasErrors}")
+  main.flex.column.middle.center(ng-class="{ end: vm.file.uploading}")
+    img(ng-src="/images/icon-document.svg" ng-hide="vm.file.hasErrors || vm.file.uploading")
+
+    .progress-house(ng-show="vm.file.uploading")
+      //- button(ng-show="vm.file.uploading" ng-click="vm.file.cancel()" type="button") Cancel
+
+      progress(value="{{vm.file.progress}}" max="100") {{ vm.file.progress }}%
+
+    .failed(ng-show="vm.file.hasErrors").flex.column.center
+      img(ng-src="/images/icon-alert-red.svg")
+
+      button.clean(ng-click="vm.file.retry()" type="button") retry
+
+
+  footer.flex.space-between
+    p.file-name {{ vm.file.data.name }}
+
+    button.clean(ng-show="!vm.file.uploading" ng-click="vm.file.remove()" type="button")
+      .icon.cross
+
+  p(ng-if="vm.file.data.caption") {{ vm.file.data.caption }}
+
+  .fileActions
+    input(ng-if="vm.allowCaptions" type="text" ng-model="vm.caption")
+
+    button(ng-if="vm.allowCaptions" ng-click="vm.setCaption()") Edit Caption
