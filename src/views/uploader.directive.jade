@@ -1,4 +1,4 @@
-.flex.column.center.middle(ng-if="vm.config")
+div(ng-if="vm.config")
   uploaded-files(files="vm.uploader.files" ng-show="vm.uploader.files.length")
 
   input(ng-if="vm.config.allowMultiple" multiple="" type="file" on-file-change="vm.uploader.add(fileList)" class="choose-files")
