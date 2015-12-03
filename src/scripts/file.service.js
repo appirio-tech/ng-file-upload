@@ -67,7 +67,7 @@
 
       file.onCaptionChange({
         caption: file.data.caption,
-        id: file.data.id,
+        id:   file.data.id,
         name: file.data.name,
         path: file.data.path,
         size: file.data.size,

@@ -16,7 +16,6 @@
     vm.setCaption = function () {
       if (vm.caption.length) {
         vm.file.setCaption(vm.caption);
-        vm.caption = '';
       }
     }
   }
