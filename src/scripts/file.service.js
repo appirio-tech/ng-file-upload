@@ -23,7 +23,12 @@
       file.createRecord = options.createRecord || null;
       file.removeRecord = options.removeRecord || null;
 
-      if (!file.newFile) {
+
+      if (file.newFile) {
+        getDataUrl(data).then(function(src) {
+          file.data.src = src;
+        })
+      } else {
         file.uploading = false;
         file.hasErrors = false;
       }
@@ -130,12 +135,12 @@
     };
 
     File.prototype._onProgress = function(e) {
-      this.progress = Math.round(e.lengthComputable ? e.loaded * 100 / e.total : 0);
+      var progress = Math.round(e.lengthComputable ? e.loaded * 100 / e.total : 0);
+      this.onProgress(progress);
     };
 
     File.prototype._failed = function(err) {
       var file = this;
-      console.log(err);
       file.hasErrors = true;
       file.uploading = false;
       file.onFailure(err);
@@ -292,6 +297,23 @@
         }
         return parsedHeaders;
       };
+    }
+
+    function getDataUrl(fileData) {
+      var deferred = $q.defer();
+      var reader   = new FileReader();
+
+      reader.onload = function(){
+        deferred.resolve(reader.result);
+      };
+
+      reader.onerror = function() {
+        deferred.reject();
+      }
+
+      reader.readAsDataURL(fileData);
+
+      return deferred.promise;
     }
 
     return File;

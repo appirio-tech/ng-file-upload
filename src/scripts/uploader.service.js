@@ -165,7 +165,8 @@
             name: file.fileName,
             path: file.filePath,
             size: file.fileSize,
-            type: file.fileType
+            type: file.fileType,
+            url: file.preSignedURL
           }, {
             newFile: false,
           });

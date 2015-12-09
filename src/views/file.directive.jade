@@ -1,14 +1,18 @@
 .uploader(ng-class="{'failed': vm.file.hasErrors}")
   main.flex.column.middle.center(ng-class="{ end: vm.file.uploading}")
-    img(ng-src="/images/icon-document.svg" ng-hide="vm.file.hasErrors || vm.file.uploading")
+    .fitted(
+      ng-if="!vm.file.hasErrors"
+      style="background-image: url({{ vm.src }})"
+      ng-class="{ img: vm.hasImage, icon: !vm.hasImage }"
+    )
 
     .progress-house(ng-show="vm.file.uploading")
       //- button(ng-show="vm.file.uploading" ng-click="vm.file.cancel()" type="button") Cancel
 
-      progress(value="{{vm.file.progress}}" max="100") {{ vm.file.progress }}%
+      progress(value="{{vm.progress}}" max="100") {{ vm.progress }}%
 
     .failed(ng-show="vm.file.hasErrors").flex.column.center
-      img(ng-src="/images/icon-alert-red.svg")
+      img.icon(ng-src="/images/icon-alert-red.svg")
 
       button.clean(ng-click="vm.file.retry()" type="button") retry
 

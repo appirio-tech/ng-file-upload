@@ -5,12 +5,29 @@ ap-file {
   width: 203px;
 
   main {
-    height: 135px;
+    position: relative;
     background-color: $neutral-color-lightest;
+    height: 135px;
 
-    img {
+    .icon {
       width: 35px;
       height: 35px;
+    }
+
+    .fitted {
+      height              : 135px;
+      width               : 100%;
+
+      &.img {
+        background-position : center top;
+        background-size     : cover;
+      }
+
+      &.icon {
+        background-position : center center;
+        background-size     : 35px;
+        background-repeat   : no-repeat;
+      }
     }
   }
 
@@ -30,7 +47,12 @@ ap-file {
   }
 
   .progress-house {
-    margin: 0 20px 18px 20px;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 100px;
+    padding: 13px 20px 7px 20px;
+    background-color: rgba(255,255,255,0.7);
   }
 
   progress {

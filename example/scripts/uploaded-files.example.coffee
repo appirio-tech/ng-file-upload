@@ -12,6 +12,7 @@ UploadedFilesExampleController = ($scope) ->
       data:
         name: 'samin.jpg'
         caption: ''
+        type: 'image/jpg'
 
     for i in [0..5]
       vm.files.push
@@ -19,6 +20,7 @@ UploadedFilesExampleController = ($scope) ->
         progress: 50
         data:
           name: 'alex.jpg'
+          type: 'image/jpg'
 
     vm.files.push
       uploading: false
@@ -28,6 +30,7 @@ UploadedFilesExampleController = ($scope) ->
       data:
         name: 'andrew.jpg'
         caption: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+        type: 'image/jpg'
 
     vm
 
