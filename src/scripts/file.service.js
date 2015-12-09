@@ -17,6 +17,7 @@
       file.newFile = options.newFile !== false;
       file.locked = options.locked || false;
       file.allowCaptions = options.allowCaptions || false;
+      file.isImage = data.type.match('image.*');
 
       file.presign = options.presign || null;
       file.query = options.query || null;
@@ -25,9 +26,11 @@
 
 
       if (file.newFile) {
-        getDataUrl(data).then(function(src) {
-          file.data.src = src;
-        })
+        if (file.isImage) {
+          getDataUrl(data).then(function(src) {
+            file.data.src = src;
+          })
+        }
       } else {
         file.uploading = false;
         file.hasErrors = false;

@@ -17,7 +17,7 @@
     var setSrc = function() {
       var src = vm.file.data.src || vm.file.data.url
 
-      if (src && vm.file.data.type.match('image.*')) {
+      if (src && vm.file.isImage) {
         vm.hasImage = true;
       }
 
