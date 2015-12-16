@@ -18,7 +18,7 @@
   "dependencies": {
     "angular": "1.4.x",
     "angular-resource": "1.4.x",
-    "appirio-tech-ng-ui-components": "0.x.x"
+    "appirio-tech-ng-ui-components": "1.x.x"
   },
   "ignore": [
     "**/*",
