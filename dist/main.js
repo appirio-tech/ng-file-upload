@@ -275,6 +275,7 @@
       file.newFile = options.newFile !== false;
       file.locked = options.locked || false;
       file.allowCaptions = options.allowCaptions || false;
+      file.isImage = data.type.match('image.*');
 
       file.presign = options.presign || null;
       file.query = options.query || null;
@@ -283,9 +284,11 @@
 
 
       if (file.newFile) {
-        getDataUrl(data).then(function(src) {
-          file.data.src = src;
-        })
+        if (file.isImage) {
+          getDataUrl(data).then(function(src) {
+            file.data.src = src;
+          })
+        }
       } else {
         file.uploading = false;
         file.hasErrors = false;
@@ -584,19 +587,19 @@
 
   // Gets around Angular's inability to bind to file input's change event
   // See https://github.com/angular/angular.js/issues/1375
-  angular.module('ap-file-upload').directive('onFileChange', onFileChangeDirective);
+  angular.module('ap-file-upload').directive('onFileChanged', onFileChangedDirective);
 
-  onFileChangeDirective.$inject = [];
+  onFileChangedDirective.$inject = [];
 
-  function onFileChangeDirective() {
+  function onFileChangedDirective() {
     return {
       restrict: 'A',
       scope: {
-        onFileChange: '&'
+        onFileChanged: '&'
       },
       link: function(scope, element, attr, ctrl) {
         element.bind("change", function() {
-          scope.onFileChange({fileList : element[0].files});
+          scope.onFileChanged({fileList : element[0].files});
           this.value = '';
         });
       }
@@ -719,7 +722,7 @@
     var setSrc = function() {
       var src = vm.file.data.src || vm.file.data.url
 
-      if (src && vm.file.data.type.match('image.*')) {
+      if (src && vm.file.isImage) {
         vm.hasImage = true;
       }
 
@@ -763,6 +766,6 @@
 
 }).call(this);
 
-angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("views/file.directive.html","<div ng-class=\"{\'failed\': vm.file.hasErrors}\" class=uploader><main ng-class=\"{ end: vm.file.uploading}\" class=\"flex column middle center\"><div ng-if=!vm.file.hasErrors style=\"background-image: url({{ vm.src }})\" ng-class=\"{ img: vm.hasImage, icon: !vm.hasImage }\" class=fitted></div><div ng-show=vm.file.uploading class=progress-house><progress value={{vm.progress}} max=100>{{ vm.progress }}%</progress></div><div ng-show=vm.file.hasErrors class=\"failed flex column center\"><img ng-src=/images/icon-alert-red.svg class=icon><button ng-click=vm.file.retry() type=button class=clean>retry</button></div></main><footer class=\"flex space-between\"><p class=file-name>{{ vm.file.data.name }}</p><button ng-show=!vm.file.uploading ng-click=vm.file.remove() type=button class=clean><div class=\"icon cross\"></div></button></footer><textarea ng-if=vm.allowCaptions ng-model=vm.caption ng-blur=vm.setCaption() placeholder=\"enter a caption\"></textarea></div>");
-$templateCache.put("views/uploaded-files.directive.html","<ul class=\"flex wrap\"><li ng-repeat=\"file in files\"><ap-file file=file></ap-file></li></ul>");
-$templateCache.put("views/uploader.directive.html","<div ng-if=vm.config><uploaded-files files=vm.uploader.files ng-show=vm.uploader.files.length></uploaded-files><input ng-if=vm.config.allowMultiple multiple type=file on-file-change=vm.uploader.add(fileList) class=choose-files><input ng-if=!vm.config.allowMultiple type=file on-file-change=vm.uploader.add(fileList) class=choose-files></div>");}]);
+angular.module("ap-file-upload").run(["$templateCache", function($templateCache) {$templateCache.put("views/file.directive.html","<div ng-class=\"{\'failed\': vm.file.hasErrors}\" class=\"uploader\"><main ng-class=\"{ end: vm.file.uploading}\" class=\"flex column middle center\"><div ng-if=\"!vm.file.hasErrors\" style=\"background-image: url({{ vm.src }})\" ng-class=\"{ img: vm.hasImage, icon: !vm.hasImage }\" class=\"fitted\"></div><div ng-show=\"vm.file.uploading\" class=\"progress-house\"><progress value=\"{{vm.progress}}\" max=\"100\">{{ vm.progress }}%</progress></div><div ng-show=\"vm.file.hasErrors\" class=\"failed flex column center\"><img ng-src=\"/images/icon-alert-red.svg\" class=\"icon\"/><button ng-click=\"vm.file.retry()\" type=\"button\" class=\"clean\">retry</button></div></main><footer class=\"flex space-between\"><p class=\"file-name\">{{ vm.file.data.name }}</p><button ng-show=\"!vm.file.uploading\" ng-click=\"vm.file.remove()\" type=\"button\" class=\"clean\"><div class=\"icon cross\"></div></button></footer><textarea ng-if=\"vm.allowCaptions\" ng-model=\"vm.caption\" ng-blur=\"vm.setCaption()\" placeholder=\"enter a caption\"></textarea></div>");
+$templateCache.put("views/uploaded-files.directive.html","<ul class=\"flex wrap\"><li ng-repeat=\"file in files\"><ap-file file=\"file\"></ap-file></li></ul>");
+$templateCache.put("views/uploader.directive.html","<div ng-if=\"vm.config\"><uploaded-files files=\"vm.uploader.files\" ng-show=\"vm.uploader.files.length\"></uploaded-files><input ng-if=\"vm.config.allowMultiple\" multiple=\"\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/><input ng-if=\"!vm.config.allowMultiple\" type=\"file\" on-file-change=\"vm.uploader.add(fileList)\" class=\"choose-files\"/></div>");}]);
