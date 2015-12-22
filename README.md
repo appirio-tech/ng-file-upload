@@ -35,16 +35,16 @@ config (required) - [object]: Contains all the config information need to run an
 ### Install
 
 ```
+> nvm use
 > npm install
-> bower install
 ```
 
 ### Using the example app
 
-``gulp serve`` will start a local Browsersync server.
+``npm run dev`` will start a local Browsersync server.
 
 ### Comitting changes
 
-The bower component served by this repo only includes the dist folder, which is committed. Make sure to ``gulp build`` before adding your files.
+The bower component served by this repo only includes the dist folder, which is committed.
 
 

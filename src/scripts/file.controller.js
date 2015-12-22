@@ -20,8 +20,7 @@
       if (src && vm.file.isImage) {
         vm.hasImage = true;
       }
-
-      vm.src = src || '/images/icon-document.svg';
+      vm.src = src || require('../images/icon-document.svg');
     }
 
     $scope.$watch('vm.file.data.src', setSrc);

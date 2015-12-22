@@ -12,7 +12,7 @@
       progress(value="{{vm.progress}}" max="100") {{ vm.progress }}%
 
     .failed(ng-show="vm.file.hasErrors").flex.column.center
-      img.icon(ng-src="/images/icon-alert-red.svg")
+      img.icon(ng-src=require("../images/icon-alert-red.svg"))
 
       button.clean(ng-click="vm.file.retry()" type="button") retry
 
