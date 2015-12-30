@@ -1,9 +1,6 @@
-require.context './styles/', true, /^(.*\.(scss$))[^.]*$/igm
-
 require 'appirio-tech-ng-ui-components'
 require 'appirio-tech-ng-auth'
 require './scripts/ap-file-upload.module'
-
 
 require './scripts/file.controller'
 require './scripts/file.directive'
@@ -14,6 +11,15 @@ require './scripts/uploader.controller'
 require './scripts/uploader.directive'
 require './scripts/uploader.service'
 
+requireContextFiles = (files) ->
+  paths = files.keys()
+
+  for path in paths
+    files path
+
+styles      = require.context './styles/', true, /^(.*\.(scss$))[^.]*$/igm
+
+requireContextFiles styles
 
 views     = require.context './views/', true, /^(.*\.(jade$))[^.]*$/igm
 viewPaths = views.keys()
