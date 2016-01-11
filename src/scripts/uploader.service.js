@@ -34,6 +34,8 @@
 
     Uploader.prototype.onUploadSuccess = function() { /* noop */ };
 
+    Uploader.prototype.onFileRemoval = function() { /* noop */ };
+
     Uploader.prototype.config = function(options) {
       options = options || {};
 
@@ -54,6 +56,9 @@
         this.onUploadSuccess = options.onUploadSuccess;
       }
 
+      if (options.onFileRemoval) {
+        this.onFileRemoval = options.onFileRemoval;
+      }
 
       if (options.presign) {
         this.presign.resource = $resource(options.presign.url);
@@ -217,6 +222,7 @@
 
     Uploader.prototype._remove = function(file) {
       this.files.splice(this._indexOfFilename(file.data.name), 1);
+      this.onFileRemoval(this._indexOfFilename(file.data.name))
       this.onUpdate();
 
       return $q.when(true);
