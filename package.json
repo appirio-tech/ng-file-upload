@@ -3,10 +3,13 @@
   "version": "1.0.1",
   "main": "./src/src.coffee",
   "devDependencies": {
+    "react-router": "^1.0.3",
+    "history": "^1.17.0",
     "appirio-tech-webpack-config": "0.x.x"
   },
   "scripts": {
     "dev": "webpack-dev-server -d --colors",
+    "react-dev": "webpack-dev-server -d --colors --react-dev",
     "clean": "rm -r dist",
     "build": "webpack --config webpack.config.js; cp example/index.html dist/"
   },
