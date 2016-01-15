@@ -11,6 +11,10 @@ component = ({data, state}) ->
   <ul className="ExampleNav">
     <li>
       <Link to="/">UploadedFile</Link>
+
+      <Link to="/UploadedFilesExamples">UploadedFiles</Link>
+
+      <Link to="/FileUploaderExamples">FileUploader</Link>
     </li>
   </ul>
 

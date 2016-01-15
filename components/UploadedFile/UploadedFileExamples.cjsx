@@ -1,6 +1,6 @@
 'use strict'
 
-UploadedFile = require './UploadedFile.cjsx'
+UploadedFile = require './UploadedFile'
 React  = require 'react'
 
 UploadedFileExamples = ->
