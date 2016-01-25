@@ -8,14 +8,14 @@
     "appirio-tech-webpack-config": "0.x.x"
   },
   "scripts": {
-    "dev": "webpack-dev-server -d --colors",
-    "react-dev": "webpack-dev-server -d --progress --inline --colors --react-dev",
+    "example": "webpack-dev-server -d --progress --inline --colors",
+    "dev": "webpack-dev-server -d --progress --inline --colors --dev",
     "clean": "rm -r dist",
     "build": "webpack --config webpack.config.js; cp example/index.html dist/"
   },
   "dependencies": {
     "appirio-styles": "0.x.x",
-    "appirio-tech-client-app-layer": "0.x.x",
+    "appirio-tech-client-app-layer": "https://github.com/appirio-tech/client-app-layer.git#attachments",
     "appirio-tech-ng-auth": "4.x.x",
     "appirio-tech-ng-ui-components": "2.x.x",
     "react-dropzone": "3.x.x",
