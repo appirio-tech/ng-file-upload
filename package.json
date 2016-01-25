@@ -1,7 +1,7 @@
 {
   "name": "appirio-tech-ng-file-upload",
   "version": "1.0.1",
-  "main": "./src/src.coffee",
+  "main": "./index.coffee",
   "devDependencies": {
     "react-router": "^1.0.3",
     "history": "^1.17.0",
@@ -9,13 +9,16 @@
   },
   "scripts": {
     "dev": "webpack-dev-server -d --colors",
-    "react-dev": "webpack-dev-server -d --colors --react-dev",
+    "react-dev": "webpack-dev-server -d --progress --inline --colors --react-dev",
     "clean": "rm -r dist",
     "build": "webpack --config webpack.config.js; cp example/index.html dist/"
   },
   "dependencies": {
     "appirio-styles": "0.x.x",
+    "appirio-tech-client-app-layer": "0.x.x",
     "appirio-tech-ng-auth": "4.x.x",
-    "appirio-tech-ng-ui-components": "2.x.x"
+    "appirio-tech-ng-ui-components": "2.x.x",
+    "react-dropzone": "3.x.x",
+    "react-redux": "4.x.x"
   }
 }

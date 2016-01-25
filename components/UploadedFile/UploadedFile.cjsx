@@ -5,7 +5,7 @@ require './UploadedFileStyles'
 React      = require 'react'
 classnames = require 'classnames'
 
-UploadedFile = ({status, src, isImage, progress, fileName, onRemove, enableCaptions, captions}) ->
+UploadedFile = ({status, imageSrc, progress, fileName, onRemove, enableCaptions, captions}) ->
   <div className="UploadedFile">
     <main className="flex column middle center" >
       {
@@ -18,8 +18,8 @@ UploadedFile = ({status, src, isImage, progress, fileName, onRemove, enableCapti
             </button>
           </div>
         else
-          if isImage
-            <div className="preview" style={backgroundImage: "url(#{src})"} />
+          if imageSrc
+            <div className="preview" style={backgroundImage: "url(#{imageSrc})"} />
           else
             <img className="document-icon" src={require './icon-document.svg'} />
       }

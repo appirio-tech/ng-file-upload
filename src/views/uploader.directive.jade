@@ -1,7 +1,0 @@
-div(ng-if="vm.config")
-  uploaded-files(files="vm.uploader.files" ng-show="vm.uploader.files.length")
-
-  input(ng-if="vm.config.allowMultiple" multiple="" type="file" on-file-changed="vm.uploader.add(fileList)" class="choose-files")
-
-  input(ng-if="!vm.config.allowMultiple" type="file" on-file-changed="vm.uploader.add(fileList)" class="choose-files")
-

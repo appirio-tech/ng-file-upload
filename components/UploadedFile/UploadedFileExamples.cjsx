@@ -1,7 +1,8 @@
 'use strict'
 
 UploadedFile = require './UploadedFile'
-React  = require 'react'
+React        = require 'react'
+imageSrc     = 'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7'
 
 UploadedFileExamples = ->
   <div className="UploadedFileExamples flex column middle center light-bg">
@@ -9,21 +10,30 @@ UploadedFileExamples = ->
 
     <UploadedFile />
 
-    <h1>Image failed to upload</h1>
+    <h1>File failed to upload</h1>
 
     <UploadedFile status="failed" fileName="crochet-turtle.jpg" progress="50" />
 
-    <h1>Image is uploading at 50 progress</h1>
+    <h1>File with image src is uploading at 50 progress</h1>
 
-    <UploadedFile status="uploading" fileName="crochet-turtle.jpg" progress="50" src={require './crochet-turtle.jpg' } isImage={true} />
+    <UploadedFile
+      status="uploading"
+      fileName="crochet-turtle.jpg"
+      progress="50"
+      imageSrc={imageSrc}
+      />
 
-    <h1>Non-Image is uploading at 50 progress</h1>
+    <h1>File is uploading at 50 progress</h1>
 
-    <UploadedFile status="uploading" fileName="example.txt" progress="50" isImage={false} />
+    <UploadedFile status="uploading" fileName="example.txt" progress="50" />
 
     <h1>Image was uploaded, enable captions</h1>
 
-    <UploadedFile status="uploaded" fileName="crochet-turtle.jpg" src={require './crochet-turtle.jpg' } isImage={true} enableCaptions={true} captions="I am a caption." />
+    <UploadedFile
+      status="uploaded"
+      fileName="crochet-turtle.jpg"
+      enableCaptions={true}
+      captions="I am a caption." />
 
     <h1>Non-Image was uploaded</h1>
 
