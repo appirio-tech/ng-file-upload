@@ -1,3 +1,4 @@
+require '../src/src.coffee'
 require 'appirio-tech-api-schemas'
 require './styles/main.scss'
 require './scripts/example-app.module'

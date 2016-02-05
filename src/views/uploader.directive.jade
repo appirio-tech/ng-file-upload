@@ -1,7 +1,7 @@
 div(ng-if="vm.config")
   uploaded-files(files="vm.uploader.files" ng-show="vm.uploader.files.length")
 
-  input(ng-if="vm.config.allowMultiple" multiple="" type="file" on-file-changed="vm.uploader.add(fileList)" class="choose-files-multiple")
+  input(ng-if="vm.config.allowMultiple" multiple="" type="file" on-file-changed="vm.uploader.add(fileList)" class="choose-files-multiple" ng-disabled="vm.config.disabled")
 
   span(ng-if="vm.uploader.files.length == 0") No file chosen
 
@@ -10,5 +10,5 @@ div(ng-if="vm.config")
   span(ng-if="vm.uploader.files.length > 1") {{vm.uploader.files.length}} files chosen
 
 
-  input(ng-if="!vm.config.allowMultiple" type="file" on-file-changed="vm.uploader.add(fileList)" class="choose-files")
+  input(ng-if="!vm.config.allowMultiple" type="file" on-file-changed="vm.uploader.add(fileList)" class="choose-files" ng-disabled="vm.config.disabled")
 
