@@ -3,7 +3,9 @@ div(ng-if="vm.config")
 
   input(ng-if="vm.config.allowMultiple" multiple="" type="file" on-file-changed="vm.uploader.add(fileList)" class="choose-files-multiple" ng-disabled="vm.config.disabled")
 
-  span(ng-if="vm.uploader.files.length == 0") No file chosen
+  span(ng-if="vm.uploader.files.length == 0 && !vm.config.disabled") No file chosen
+
+  span(ng-if="vm.uploader.files.length == 0 && vm.config.disabled") File upload disabled
 
   span(ng-if="vm.uploader.files.length == 1") 1 file chosen
 
