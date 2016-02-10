@@ -8,7 +8,8 @@
   function apFile() {
     return {
       scope: {
-        file: '='
+        file: '=',
+        disabled: '='
       },
       controller: 'FileController as vm',
       templateUrl: 'views/file.directive.html'

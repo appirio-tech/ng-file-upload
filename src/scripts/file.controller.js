@@ -8,11 +8,12 @@
   FileController.$inject = ['$scope'];
 
   function FileController($scope) {
-    var vm = this;
-    vm.file = $scope.file;
+    var vm           = this;
+    vm.file          = $scope.file;
+    vm.disabled      = $scope.disabled;
     vm.allowCaptions = vm.file.allowCaptions;
-    vm.caption = '';
-    vm.progress = 0;
+    vm.caption       = '';
+    vm.progress      = 0;
 
     var setSrc = function() {
       var src = vm.file.data.src || vm.file.data.url

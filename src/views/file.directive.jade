@@ -20,7 +20,7 @@
   footer.flex.space-between
     p.file-name {{ vm.file.data.name }}
 
-    button.clean(ng-show="!vm.file.uploading" ng-click="vm.file.remove()" type="button")
+    button.clean(ng-show="!vm.file.uploading" ng-click="vm.file.remove()" type="button" ng-disabled="vm.disabled")
       .icon.cross
 
   textarea(
