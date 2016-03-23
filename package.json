@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "appirio-styles": "0.x.x",
-    "appirio-tech-ng-auth": "4.x.x",
+    "appirio-tech-ng-api-services": "1.x.x",
     "appirio-tech-ng-ui-components": "2.x.x"
   }
 }

@@ -5,21 +5,10 @@
     .module('example')
     .controller('ExampleAppController', ExampleAppController);
 
-  ExampleAppController.$inject = ['$scope', 'AuthService'];
+  ExampleAppController.$inject = ['$scope'];
 
-  function ExampleAppController($scope, AuthService) {
+  function ExampleAppController($scope) {
     var vm = this;
-
-    vm.authenticated = AuthService.isLoggedIn();
-    vm.login = function(formData) {
-      AuthService.login({
-        username: vm.username,
-        password: vm.password,
-        success: function() {
-          vm.authenticated = AuthService.isLoggedIn();
-        }
-      });
-    };
 
     var domain = 'https://api.topcoder-dev.com';
     var workId = '1446138896308-90856fe5-cee3-4e51-95c2-f0e51a803780';
